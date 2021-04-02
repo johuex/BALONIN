@@ -7,7 +7,7 @@ if (tick == 0) {
 
         Semaphor = DrawSemaphor()
         Semaphor.scale.set(W, W, W)
-        Semaphor.position.set(0, 0, -50)
+        Semaphor.position.set(0, 0, 0)
         scene.add(Semaphor);
 
         render();
@@ -63,6 +63,39 @@ function SegmentSemaphor(material) // материал определяет цв
 
     return segment
 }
+
+
+function DrawSvetofor() {
+    var svet = new THREE.Object3D()
+    var material = new THREE.MeshLambertMaterial();
+    material.color.set(0x000000);
+    var geometry = new THREE.CubeGeometry(10, 10, 5, 20);
+    var corpus = new THREE.Mesh(geometry, material);
+
+    glassfile="http://livelab.spb.ru/labs/files/glass.png";
+    var load = new THREE.TextureLoader().load(glassfile);
+    materialGlass = new THREE.MeshPhongMaterial({
+        color: 0x999999,
+        map: load, overdraw: false,
+        depthWrite: true, opacity: 0.5, transparent: true
+    });
+    var geometry2 = new THREE.ConeGeometry(5, 2, 11);
+    var steklo = new THREE.Mesh(geometry2, materialGlass);
+
+    //const light = new THREE.DirectionalLight( 0x00FF00, 0.5 );
+    
+    corpus.position.set(0,0,0)
+    svet.add(corpus)
+
+    steklo.position.set(0, 0, 3)
+    steklo.rotation.set(1.58, 0, 0)
+    svet.add(steklo)
+
+    //light.position.set(-10,0,0);
+    //svet.add(light);
+    return svet
+}
+
 
 function DrawCrilo() {
     
@@ -126,6 +159,24 @@ function DrawSemaphor() {
     krilo2.rotation.set(0, 0, -1.58);
     Semaphor.add(krilo1);
     Semaphor.add(krilo2);
+
+    var svetofor1 = DrawSvetofor()
+    var svetofor2 = DrawSvetofor()
+    svetofor1.position.set(-0.5, -4, 0.4*15*15-6);
+    svetofor1.scale.set(0.75, 0.75, 0.75);
+    svetofor1.rotation.set(0,-1.58, 0);
+    svetofor2.position.set(-0.5, -4, 0.4*20*15-6);
+    svetofor2.scale.set(0.75, 0.75, 0.75);
+    svetofor2.rotation.set(0,-1.58, 0);
+    Semaphor.add(svetofor1);
+    Semaphor.add(svetofor2);
+
+    var material2 = new THREE.MeshLambertMaterial();
+    material2.color.set(0x000000);
+    var geometry = new THREE.CubeGeometry(10, 10, 5, 20);
+    var dno = new THREE.Mesh(geometry, material2);
+    dno.position.set(2,0,-2.5);
+    Semaphor.add(dno);
     return Semaphor
 
 }

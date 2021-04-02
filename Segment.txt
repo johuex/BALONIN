@@ -7,7 +7,7 @@ if (tick == 0) {
 
         Semaphor = DrawSemaphor()
         Semaphor.scale.set(W, W, W)
-        Semaphor.position.set(0, 0, 0)
+        Semaphor.position.set(0, 0, -50)
         scene.add(Semaphor);
 
         render();
@@ -63,51 +63,69 @@ function SegmentSemaphor(material) // материал определяет цв
 
     return segment
 }
-/*
+
 function DrawCrilo() {
     
     var material = new THREE.MeshLambertMaterial();
     material.color.set(0xFF0000);
-    var geometry = new THREE.CylinderGeometry(20, 5, 1);
-    var box = new THREE.Mesh(geometry, material);
-    
-    var geometry1 = new THREE.CylinderGeometry(5, 5, 1, 20);
-    var crug = new THREE.Mesh(geometry1, material);
+    var geometry1 = new THREE.CubeGeometry(30, 3, 1);
+    var box = new THREE.Mesh(geometry1, material);
+  
+    var geometry2 = new THREE.CylinderGeometry(7, 7, 1, 20);
+    var crug = new THREE.Mesh(geometry2, material);
+
+    var material2 = new THREE.MeshLambertMaterial();
+    material2.color.set(0x000000);
+    var geometry3 = new THREE.CubeGeometry(20, 3, 1);
+    var box2 = new THREE.Mesh(geometry3, material2);
+    var geometry4 = new THREE.CylinderGeometry(3, 3, 1, 20);
+    var crug2 = new THREE.Mesh(geometry4, material2);
 
     var crilo = new THREE.Object3D()
     box.position.set(0,0,0);
-    crug.position.set(0,0,0);
+    box.rotation.set(1.57, 0,0);
+    crug.position.set(20,0,0);
+    box2.position.set(-25,0,0);
+    box2.rotation.set(1.57, 0,0);
+    crug2.position.set(-25,0,0);
     crilo.add(box);
     crilo.add(crug);
+    crilo.add(box2)
+    crilo.add(crug2)
     return crilo
 }
-*/
+
 function DrawSemaphor() {
     
     var Semaphor = new THREE.Object3D()
 
     //построение сегментов
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 20; i++) {
         var material = new THREE.MeshLambertMaterial()
-        if (i < 5) {
+        if (i < 10) {
             material.color.set(0xFF0000);
         }
         else {
             material.color.set(0xFFFFFF);
         }
         var segment = SegmentSemaphor(material);
-        segment.position.z = 15 * i;
+        segment.position.z = 0.4*15 * i;
+        segment.scale.set(0.4, 0.4, 0.4);
 
         
 
         Semaphor.add(segment);
     }
-    //var krilo1 = DrawCrilo()
-    //var krilo2 = DrawCrilo()
-    //krilo1.position.set(0, 0, 0)
-    //krilo2.position.set(0, 0, 0)
-    // Semaphor.add(krilo1);
-    //Semaphor.add(krilo2);
+    var krilo1 = DrawCrilo();
+    var krilo2 = DrawCrilo();
+    krilo1.position.set(-0.5, -10, 0.4*15*15);
+    krilo1.scale.set(0.75, 0.75, 0.75);
+    krilo2.position.set(-0.5, -10, 0.4*20*15);
+    krilo2.scale.set(0.75, 0.75, 0.75);
+    krilo1.rotation.set(0, 0,-1.58);
+    krilo2.rotation.set(0, 0, -1.58);
+    Semaphor.add(krilo1);
+    Semaphor.add(krilo2);
     return Semaphor
 
 }
@@ -160,16 +178,14 @@ function CreateScene(WC, HC) {
     }
 }
 
-{
-    {
-        html
-        < !DOCTYPE html >
-            <head>
-                <script SRC="http://livelab.spb.ru/x3d/three.min.js"></script>
-                <script SRC="http://livelab.spb.ru/x3d/TrackballControls.js"></script>
-                <script SRC="http://livelab.spb.ru/x3d/OBJLoader.js"></script>
-                <script SRC="http://livelab.spb.ru/x3d/DDSLoader.js"></script>
-                <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
-                <input type=button value='Gudok' onclick='sound("done.wav");'>
-        </head>
-    html}}
+{{html
+    < !DOCTYPE html >
+        <head>
+            <script SRC="http://livelab.spb.ru/x3d/three.min.js"></script>
+            <script SRC="http://livelab.spb.ru/x3d/TrackballControls.js"></script>
+            <script SRC="http://livelab.spb.ru/x3d/OBJLoader.js"></script>
+            <script SRC="http://livelab.spb.ru/x3d/DDSLoader.js"></script>
+            <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
+            <input type=button value='Gudok' onclick='sound("done.wav");'>
+    </head>
+html}}

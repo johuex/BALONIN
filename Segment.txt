@@ -1,0 +1,175 @@
+if (tick == 0) {
+    if (typeof (sceneexist) == 'undefined') {
+        OpenCanvas('wCanvas', WC = 520, HC = 350);
+        var scene, camera, renderer; CreateScene(WC, HC);
+
+        X = 0; Y = 0; Z = 10; W = 1;
+
+        Semaphor = DrawSemaphor()
+        Semaphor.scale.set(W, W, W)
+        Semaphor.position.set(0, 0, 0)
+        scene.add(Semaphor);
+
+        render();
+    }
+}
+
+
+function SegmentSemaphor(material) // материал определяет цвет секции семафора
+{
+    var geometry = new THREE.CylinderGeometry(1, 1, 15, 10);
+    var geometry1 = new THREE.CylinderGeometry(1, 1, 20, 10);
+    //балки верхей части сегмента
+    var balka1 = new THREE.Mesh(geometry, material);
+    var balka2 = new THREE.Mesh(geometry, material);
+    var balka3 = new THREE.Mesh(geometry, material);
+    var balka4 = new THREE.Mesh(geometry, material);
+    var balka5 = new THREE.Mesh(geometry1, material);
+
+
+
+
+    var segment = new THREE.Object3D()
+    var storona = new THREE.Object3D()
+    balka1.position.set(0, 0, 0);
+    //balka1.rotate.set()
+    storona.add(balka1);
+
+    balka2.position.set(0, 0, 13);
+    //balka4.rotation.set()
+    storona.add(balka2);
+
+    balka3.position.set(0, 7.5, 6.5);
+    balka3.rotation.set(1.57, 0, 0);
+    storona.add(balka3);
+
+    balka4.position.set(0, -7.5, 6.5);
+    balka4.rotation.set(1.57, 0, 0);
+    storona.add(balka4);
+
+    balka5.position.set(0, 0, 6.5);
+    balka5.rotation.set(-0.7, 0, 0);
+    storona.add(balka5);
+    segment.add(storona);
+
+    var storona2 = storona.clone();
+    var storona3 = storona.clone();
+    storona2.position.set(6.5, 3.75, 0);
+    storona2.rotation.set(0, 0, 1.04);
+    storona3.position.set(6.5, -3.75, 0);
+    storona3.rotation.set(0, 0, -1.04);
+    segment.add(storona2);
+    segment.add(storona3);
+
+    return segment
+}
+/*
+function DrawCrilo() {
+    
+    var material = new THREE.MeshLambertMaterial();
+    material.color.set(0xFF0000);
+    var geometry = new THREE.CylinderGeometry(20, 5, 1);
+    var box = new THREE.Mesh(geometry, material);
+    
+    var geometry1 = new THREE.CylinderGeometry(5, 5, 1, 20);
+    var crug = new THREE.Mesh(geometry1, material);
+
+    var crilo = new THREE.Object3D()
+    box.position.set(0,0,0);
+    crug.position.set(0,0,0);
+    crilo.add(box);
+    crilo.add(crug);
+    return crilo
+}
+*/
+function DrawSemaphor() {
+    
+    var Semaphor = new THREE.Object3D()
+
+    //построение сегментов
+    for (i = 0; i < 10; i++) {
+        var material = new THREE.MeshLambertMaterial()
+        if (i < 5) {
+            material.color.set(0xFF0000);
+        }
+        else {
+            material.color.set(0xFFFFFF);
+        }
+        var segment = SegmentSemaphor(material);
+        segment.position.z = 15 * i;
+
+        
+
+        Semaphor.add(segment);
+    }
+    //var krilo1 = DrawCrilo()
+    //var krilo2 = DrawCrilo()
+    //krilo1.position.set(0, 0, 0)
+    //krilo2.position.set(0, 0, 0)
+    // Semaphor.add(krilo1);
+    //Semaphor.add(krilo2);
+    return Semaphor
+
+}
+
+
+function render() {
+    requestAnimationFrame(render);
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+function CreateScene(WC, HC) {
+    if (typeof (sceneexist) == 'undefined') {
+        sceneexist = true;
+        // объявление сцены
+        scene = new THREE.Scene();
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
+        scene.background = new THREE.Color(0x444488);
+        camera = new THREE.PerspectiveCamera(25, WC / HC, 1, 1000);
+        camera.position.x = 0;
+        camera.position.y = -360;
+        camera.position.z = 100;
+        //  camera.lookAt( scene.position );
+        renderer = new THREE.WebGLRenderer({
+            alpha: true, antialias: true
+        });
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        // привяжем отрисовку к html и высоте канвы
+        // renderer.setSize( window.innerWidth, window.innerHeight );
+        document.getElementById("wCanvas").appendChild(renderer.domElement);
+        renderer.setSize(WC, HC);
+        // установим модуль управления камерой
+        controls = new THREE.TrackballControls(camera, renderer.domElement);
+        controls.rotateSpeed = 1.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.noZoom = false;
+        controls.noPan = true;
+        controls.staticMoving = false;
+        controls.dynamicDampingFactor = 0.2;
+        // источники света
+        scene.add(new THREE.AmbientLight(0x555555));
+        var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(100, -100, 40).normalize();
+        scene.add(directionalLight);
+        directionalLight.position.set(100, -100, 40).normalize();
+        scene.add(directionalLight);
+    }
+}
+
+{
+    {
+        html
+        < !DOCTYPE html >
+            <head>
+                <script SRC="http://livelab.spb.ru/x3d/three.min.js"></script>
+                <script SRC="http://livelab.spb.ru/x3d/TrackballControls.js"></script>
+                <script SRC="http://livelab.spb.ru/x3d/OBJLoader.js"></script>
+                <script SRC="http://livelab.spb.ru/x3d/DDSLoader.js"></script>
+                <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
+                <input type=button value='Gudok' onclick='sound("done.wav");'>
+        </head>
+    html}}

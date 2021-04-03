@@ -4,12 +4,17 @@ if (tick == 0) {
         var scene, camera, renderer; CreateScene(WC, HC);
 
         X = 0; Y = 0; Z = 10; W = 1;
-        strelka = new THREE.Object3D();
+        var strelka = new THREE.Object3D();
         osnova = DrawOsnova()
         ruka = DrawRuka()
         gruz = DrawGruz()
-        ruka.position.set(-4,3,0)
-        strelka.add(osnova); strelka.add(ruka); strelka.add(gruz);
+        //ruka.position.set(-3,2.3,0)
+        //gruz.position.set(-3.8,2.3,0);
+        var ruka_gruz = new THREE.Object3D()
+        ruka_gruz.add(ruka); ruka_gruz.add(gruz);
+        ruka_gruz.position.set(-3,2.3,0);
+        //ruka_gruz.rotation.set(0,-0.5,0);
+        strelka.add(osnova); strelka.add(ruka_gruz);
         scene.add(strelka)
         
 
@@ -78,22 +83,45 @@ function DrawOsnova() {
 
 function DrawRuka() {
     var ruka = new THREE.Object3D();
-    var balka1 = Cyl(0.2,0.2,6, "#000000");
-    balka1.position.set(3,-0.8,0.5)
-    balka1.rotation.set(0,0,1.57)
+    var balka1 = Cyl(0.2,0.2,6, "#ffffff");
+    //balka1.position.set(-3,2.3,0);
+    //balka1.rotation.set(0,-0.5,0);
+    balka1.position.set(-4,2.3,3)
+    balka1.rotation.set(0,-1.57,1.57)
     ruka.add(balka1)
     return ruka
 }
 
 function DrawGruz() {
-    var gruz = new Box(2,2,2, "#FFFFFF");
-    var balka1 = Cyl(0.2,0.2,6, "#ffffff");
-    var tor = Torus(0.3, 0.2, 10, 100, 6.3,"#ffffff");
-    tor.position.set(-1,2.2,0.5)
-    tor.rotation.set(0, 1.57, 0)
-    balka1.position.set(6,-0.8,0.5)
+    var gruz = new THREE.Object3D()
+    var box = new Box(2,1.3,1, "#FFFFFF");
+    var box1 = new Box(0.5,1,1, "#FFFFFF");
+    var box2 = new Box(0.5,1,1, "#FFFFFF");
+    var box3 = new Box(1,2,0.3, "#ffffff");
+    var balka1 = Cyl(0.2,0.2,2, "#000000");
+    var balka2 = Cyl(0.2,0.2,3, "#000000");
+    var tor = Torus(0.3, 0.2, 10, 100, 6.3,"#000000");
+    tor.position.set(0,0,1.8)
+    tor.rotation.set(0, 1, 0)
+    balka1.position.set(1,0,1.5)
+    balka1.rotation.set(0,0.3, 1.57)
+    balka2.position.set(2.5,0,1.3)
+    balka2.rotation.set(0,0, 1.57)
+    box.position.set(2,0,1)
+    box.rotation.set(1.57, 0,0)
+    box1.position.set(1.25,0,1.8)
+    box2.position.set(2.75,0,1.8)
+    box3.position.set(2,0,2.3)
+    box3.rotation.set(0,0,1.57)
     gruz.add(tor)
+    gruz.add(box)
     gruz.add(balka1)
+    gruz.add(balka2)
+    gruz.add(box1)
+    gruz.add(box2)
+    gruz.add(box3)
+    gruz.position.set(-2.8,2.3,1)
+    gruz.rotation.set(0,-0.7,0)
 
     return gruz
 }
@@ -106,11 +134,12 @@ function render() {
     delta = clock.getDelta();
     time += delta;
 
-
-    //???.rotation.x = abs(cos(time)) * (-0.3);
-    //krilo1.position.z = abs(cos(time)) * (-0.9);
-    //???.rotation.x = abs(cos(time)) * (-0.3);
-    //krilo2.position.z = abs(cos(time)) * (0.9);
+    ruka_gruz.rotation.y = abs(cos(time)) * (-3.14);
+    ruka_gruz.position.x = abs(cos(time)) * (-1.5);
+    //ruka.rotation.y = abs(cos(time)) * (-1);
+    //ruka.position.x = abs(cos(time)) * (-1.5);
+    gruz.rotation.z = abs(cos(time)) * (-3.14);
+    //gruz.position.x = abs(cos(time)) * (-5);
 }
 
 function CreateScene(WC, HC) {

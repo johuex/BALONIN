@@ -7,16 +7,16 @@ if (tick == 0) {
 
         Semaphor = DrawSemaphor()
         Semaphor.scale.set(W, W, W)
-        Semaphor.position.set(0, 0, -60)
+        Semaphor.position.set(0, 0, -80)
         
-        var krilo1 = DrawCrilo();
-        var krilo2 = DrawCrilo();
+        var krilo1 = DrawCrilo(false);
+        var krilo2 = DrawCrilo(true);
         n = 22
         krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
         krilo1.scale.set(0.75, 0.75, 0.75);
         krilo2.position.set(-0.5, 0, 0.4*(n)*15);
         krilo2.scale.set(0.75, 0.75, 0.75);
-        krilo1.rotation.set(0, 0,-1.58);
+        krilo1.rotation.set(1, 0,-1.58);
         krilo2.rotation.set(0, 0, -1.58);
         Semaphor.add(krilo1);
         Semaphor.add(krilo2);
@@ -32,17 +32,41 @@ if (tick == 0) {
     }
 }
 
+function Box(x,y,z,col) {
+    var material = new THREE.MeshLambertMaterial({color: col});
+    var geometry = new THREE.CubeGeometry(x,y,z);
+    return new THREE.Mesh( geometry, material ); 
+}
 
-function SegmentSemaphor(material) // материал определяет цвет секции семафора
+function Cyl(x,y,z,col) {
+    var material = new THREE.MeshLambertMaterial({color: col});
+    var geometry = new THREE.CylinderGeometry(x,y,z,15);
+    return new THREE.Mesh( geometry, material );
+
+}
+
+function Circle(radius, segments, start, lenght, col) {
+    var material = new THREE.MeshLambertMaterial({color: col});
+    var geometry = new THREE.CircleGeometry(radius, segments, start, lenght);
+    return new THREE.Mesh( geometry, material );
+}
+
+function Torus(radius, tube, radialSegments, tubularSegments, arc, col) {
+    var material = new THREE.MeshLambertMaterial({color: col});
+    var geometry = new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
+    return new THREE.Mesh( geometry, material );
+}
+
+
+function SegmentSemaphor(col) // материал определяет цвет секции семафора
 {
-    var geometry = new THREE.CylinderGeometry(1, 1, 15, 10);
-    var geometry1 = new THREE.CylinderGeometry(1, 1, 20, 10);
+
     //балки верхей части сегмента
-    var balka1 = new THREE.Mesh(geometry, material);
-    var balka2 = new THREE.Mesh(geometry, material);
-    var balka3 = new THREE.Mesh(geometry, material);
-    var balka4 = new THREE.Mesh(geometry, material);
-    var balka5 = new THREE.Mesh(geometry1, material);
+    var balka1 = Cyl(1, 1, 15, col);
+    var balka2 = Cyl(1, 1, 15, col);
+    var balka3 = Cyl(1, 1, 15, col);
+    var balka4 = Cyl(1, 1, 15, col);
+    var balka5 = Cyl(1, 1, 20, col);
 
 
 
@@ -83,66 +107,74 @@ function SegmentSemaphor(material) // материал определяет цв
 }
 
 
-function DrawSvetofor() {
+function DrawSvetofor(visota) {
     var svet = new THREE.Object3D()
-    var material = new THREE.MeshLambertMaterial();
-    material.color.set(0x000000);
-    var geometry = new THREE.CubeGeometry(10, 10, 5, 20);
-    var corpus = new THREE.Mesh(geometry, material);
-
-    glassfile="http://livelab.spb.ru/labs/files/glass.png";
-    var load = new THREE.TextureLoader().load(glassfile);
-    materialGlass = new THREE.MeshPhongMaterial({
-        color: 0x999999,
-        map: load, overdraw: false,
-        depthWrite: true, opacity: 0.5, transparent: true
-    });
-    var geometry2 = new THREE.ConeGeometry(5, 2, 11);
-    var steklo = new THREE.Mesh(geometry2, materialGlass);
-
-    //const light = new THREE.DirectionalLight( 0x00FF00, 0.5 );
-    
+    var corpus = Box(6, 6, 5, 0x000000);
+       
     corpus.position.set(0,0,0)
     svet.add(corpus)
 
-    steklo.position.set(0, 0, 3)
-    steklo.rotation.set(1.58, 0, 0)
-    svet.add(steklo)
 
-    //light.position.set(-10,0,0);
-    //svet.add(light);
+    var Led = new THREE.Object3D()
+    var LightStart;
+    var LightStartM=new THREE.MeshBasicMaterial();
+    if (visota) {
+        LightStartM.color.set(0xff0000)
+        LightStart  = new THREE.PointLight( 0xff0000,1,8);
+    }
+    else {
+        LightStartM.color.set(0xffba00)
+        LightStart  = new THREE.PointLight( 0xffba00,1,8);
+    }
+    var geometryL = new THREE.SphereBufferGeometry(1.7, 15, 15 ); 
+    var LightStartB = new THREE.Mesh(geometryL,LightStartM);
+    Led.add(LightStart); Led.add(LightStartB);
+    LightStartB.position.set(0, 0, 2);
+    LightStart.position.set(0, 0, 2);
+    svet.add(Led)
     return svet
 }
 
 
-function DrawCrilo() {
-    
-    var material = new THREE.MeshLambertMaterial();
-    material.color.set(0xFF0000);
-    var geometry1 = new THREE.CubeGeometry(25, 5, 1);
-    var box = new THREE.Mesh(geometry1, material);
-  
-    var geometry2 = new THREE.CylinderGeometry(5, 5, 1, 20);
-    var crug = new THREE.Mesh(geometry2, material);
-
-    var material2 = new THREE.MeshLambertMaterial();
-    material2.color.set(0x000000);
-    var geometry3 = new THREE.CubeGeometry(20, 1, 1);
-    var box2 = new THREE.Mesh(geometry3, material2);
-    var geometry4 = new THREE.CylinderGeometry(2, 2, 1, 20);
-    var crug2 = new THREE.Mesh(geometry4, material2);
-
+function DrawCrilo(visota) {
+    material = 0xFF0000
+    var box = Box(25, 5, 1, material);
+    var crug = Cyl(5, 5, 1, material);
+    var material2 = 0x000000
+    var box2 = Box(20, 1, 1, material2);
+    var crug2 = Cyl(2, 2, 1, material2);
+    var material3 = 0xFFFFFF
+    var box3 = Box(25, 5, 0.5, material3);
+    var crug3 = Cyl(5, 5, 0.5, material3);
+    var tor = Torus(3.5, 0.1, 0.1, 100, 6.3,"#000000")
+ 
     var crilo = new THREE.Object3D()
     box.position.set(10,0,0);
     box.rotation.set(1.57, 0,0);
     crug.position.set(25,0,0);
-    box2.position.set(-10,0,0);
-    box2.rotation.set(1.57, 0,0);
-    crug2.position.set(-10,0,0);
+    
+    if (visota){
+        box2.position.set(-10,0,0);
+        box2.rotation.set(1.57, 0,0);
+        crug2.position.set(-10,0,0);
+    }
+    else {
+        box2.position.set(-10,0,7);
+        box2.rotation.set(0,0.7,0);
+        crug2.position.set(-10,0,7);
+    }
+    box3.position.set(10,0.7,0);
+    box3.rotation.set(1.57, 0,0);
+    crug3.position.set(25,0.7,0);
+    tor.rotation.set(1.57, 0, 0);
+    tor.position.set(25,1,0);
     crilo.add(box);
     crilo.add(crug);
     crilo.add(box2)
     crilo.add(crug2)
+    crilo.add(box3)
+    crilo.add(crug3)
+    crilo.add(tor)
     return crilo
 }
 
@@ -150,14 +182,15 @@ function DrawSemaphor() {
     
     var Semaphor = new THREE.Object3D()
     n = 22
+    var material;
     //построение сегментов
     for (i = 0; i < n; i++) {
-        var material = new THREE.MeshLambertMaterial()
+        
         if (i < n/2) {
-            material.color.set(0xFF0000);
+            material = 0xFF0000
         }
         else {
-            material.color.set(0xFFFFFF);
+            material = 0xFFFFFF
         }
         var segment = SegmentSemaphor(material);
         segment.position.z = 0.4*15 * i;
@@ -169,21 +202,19 @@ function DrawSemaphor() {
     }
     
 
-    var svetofor1 = DrawSvetofor()
-    var svetofor2 = DrawSvetofor()
-    svetofor1.position.set(-0.5, -4, 0.4*(n-5)*15-6);
+    var svetofor1 = DrawSvetofor(false)
+    var svetofor2 = DrawSvetofor(true)
+    svetofor1.position.set(2.5, -4, 0.4*(n-5)*15);
     svetofor1.scale.set(0.75, 0.75, 0.75);
     svetofor1.rotation.set(0,-1.58, 0);
-    svetofor2.position.set(-0.5, -4, 0.4*n*15-6);
+    svetofor2.position.set(2.5, -4, 0.4*n*15);
     svetofor2.scale.set(0.75, 0.75, 0.75);
     svetofor2.rotation.set(0,-1.58, 0);
     Semaphor.add(svetofor1);
     Semaphor.add(svetofor2);
 
-    var material2 = new THREE.MeshLambertMaterial();
-    material2.color.set(0x000000);
-    var geometry = new THREE.CubeGeometry(10, 10, 5, 20);
-    var dno = new THREE.Mesh(geometry, material2);
+    material2 = 0x000000
+    var dno = Box(10, 10, 5, 20, material2);
     dno.position.set(2,0,-2.5);
     Semaphor.add(dno);
     return Semaphor
@@ -200,9 +231,9 @@ function render() {
     time += delta;
 
 
-    krilo1.rotation.x = abs(cos(time)) * (-0.3);
+    krilo1.rotation.x = abs(cos(time)) * (-0.9);
     //krilo1.position.z = abs(cos(time)) * (-0.9);
-    krilo2.rotation.x = abs(cos(time)) * (-0.3);
+    krilo2.rotation.x = abs(cos(time)) * (-0.9);
     //krilo2.position.z = abs(cos(time)) * (0.9);
 }
 

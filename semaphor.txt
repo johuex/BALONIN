@@ -7,8 +7,26 @@ if (tick == 0) {
 
         Semaphor = DrawSemaphor()
         Semaphor.scale.set(W, W, W)
-        Semaphor.position.set(0, 0, 0)
+        Semaphor.position.set(0, 0, -60)
+        
+        var krilo1 = DrawCrilo();
+        var krilo2 = DrawCrilo();
+        n = 22
+        krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
+        krilo1.scale.set(0.75, 0.75, 0.75);
+        krilo2.position.set(-0.5, 0, 0.4*(n)*15);
+        krilo2.scale.set(0.75, 0.75, 0.75);
+        krilo1.rotation.set(0, 0,-1.58);
+        krilo2.rotation.set(0, 0, -1.58);
+        Semaphor.add(krilo1);
+        Semaphor.add(krilo2);
+
         scene.add(Semaphor);
+        
+
+        var clock = new THREE.Clock();
+        var time = 0;
+        var delta = 0;
 
         render();
     }
@@ -101,26 +119,26 @@ function DrawCrilo() {
     
     var material = new THREE.MeshLambertMaterial();
     material.color.set(0xFF0000);
-    var geometry1 = new THREE.CubeGeometry(30, 3, 1);
+    var geometry1 = new THREE.CubeGeometry(25, 5, 1);
     var box = new THREE.Mesh(geometry1, material);
   
-    var geometry2 = new THREE.CylinderGeometry(7, 7, 1, 20);
+    var geometry2 = new THREE.CylinderGeometry(5, 5, 1, 20);
     var crug = new THREE.Mesh(geometry2, material);
 
     var material2 = new THREE.MeshLambertMaterial();
     material2.color.set(0x000000);
-    var geometry3 = new THREE.CubeGeometry(20, 3, 1);
+    var geometry3 = new THREE.CubeGeometry(20, 1, 1);
     var box2 = new THREE.Mesh(geometry3, material2);
-    var geometry4 = new THREE.CylinderGeometry(3, 3, 1, 20);
+    var geometry4 = new THREE.CylinderGeometry(2, 2, 1, 20);
     var crug2 = new THREE.Mesh(geometry4, material2);
 
     var crilo = new THREE.Object3D()
-    box.position.set(0,0,0);
+    box.position.set(10,0,0);
     box.rotation.set(1.57, 0,0);
-    crug.position.set(20,0,0);
-    box2.position.set(-25,0,0);
+    crug.position.set(25,0,0);
+    box2.position.set(-10,0,0);
     box2.rotation.set(1.57, 0,0);
-    crug2.position.set(-25,0,0);
+    crug2.position.set(-10,0,0);
     crilo.add(box);
     crilo.add(crug);
     crilo.add(box2)
@@ -131,11 +149,11 @@ function DrawCrilo() {
 function DrawSemaphor() {
     
     var Semaphor = new THREE.Object3D()
-
+    n = 22
     //построение сегментов
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < n; i++) {
         var material = new THREE.MeshLambertMaterial()
-        if (i < 10) {
+        if (i < n/2) {
             material.color.set(0xFF0000);
         }
         else {
@@ -149,23 +167,14 @@ function DrawSemaphor() {
 
         Semaphor.add(segment);
     }
-    var krilo1 = DrawCrilo();
-    var krilo2 = DrawCrilo();
-    krilo1.position.set(-0.5, -10, 0.4*15*15);
-    krilo1.scale.set(0.75, 0.75, 0.75);
-    krilo2.position.set(-0.5, -10, 0.4*20*15);
-    krilo2.scale.set(0.75, 0.75, 0.75);
-    krilo1.rotation.set(0, 0,-1.58);
-    krilo2.rotation.set(0, 0, -1.58);
-    Semaphor.add(krilo1);
-    Semaphor.add(krilo2);
+    
 
     var svetofor1 = DrawSvetofor()
     var svetofor2 = DrawSvetofor()
-    svetofor1.position.set(-0.5, -4, 0.4*15*15-6);
+    svetofor1.position.set(-0.5, -4, 0.4*(n-5)*15-6);
     svetofor1.scale.set(0.75, 0.75, 0.75);
     svetofor1.rotation.set(0,-1.58, 0);
-    svetofor2.position.set(-0.5, -4, 0.4*20*15-6);
+    svetofor2.position.set(-0.5, -4, 0.4*n*15-6);
     svetofor2.scale.set(0.75, 0.75, 0.75);
     svetofor2.rotation.set(0,-1.58, 0);
     Semaphor.add(svetofor1);
@@ -186,6 +195,15 @@ function render() {
     requestAnimationFrame(render);
     controls.update();
     renderer.render(scene, camera);
+
+    delta = clock.getDelta();
+    time += delta;
+
+
+    krilo1.rotation.x = abs(cos(time)) * (-0.3);
+    //krilo1.position.z = abs(cos(time)) * (-0.9);
+    krilo2.rotation.x = abs(cos(time)) * (-0.3);
+    //krilo2.position.z = abs(cos(time)) * (0.9);
 }
 
 function CreateScene(WC, HC) {

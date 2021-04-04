@@ -8,11 +8,13 @@ if (tick == 0) {
         osnova = DrawOsnova()
         ruka = DrawRuka()
         gruz = DrawGruz()
-        //ruka.position.set(-3,2.3,0)
-        //gruz.position.set(-3.8,2.3,0);
+        ruka.position.set(-1,0,1.5)
+        ruka.rotation.set(0,0.9,1.57)
+        gruz.position.set(-1,0,0);
         var ruka_gruz = new THREE.Object3D()
         ruka_gruz.add(ruka); ruka_gruz.add(gruz);
-        ruka_gruz.position.set(-3,2.3,0);
+        gruz.rotation.set(0,0,3.14)
+        ruka_gruz.position.set(-4,2.3,0);
         //ruka_gruz.rotation.set(0,-0.5,0);
         strelka.add(osnova); strelka.add(ruka_gruz);
         scene.add(strelka)
@@ -86,8 +88,8 @@ function DrawRuka() {
     var balka1 = Cyl(0.2,0.2,6, "#ffffff");
     //balka1.position.set(-3,2.3,0);
     //balka1.rotation.set(0,-0.5,0);
-    balka1.position.set(-4,2.3,3)
-    balka1.rotation.set(0,-1.57,1.57)
+    //balka1.position.set(-4,2.3,3)
+    //balka1.rotation.set(0,-1.57,1.57)
     ruka.add(balka1)
     return ruka
 }
@@ -120,8 +122,8 @@ function DrawGruz() {
     gruz.add(box1)
     gruz.add(box2)
     gruz.add(box3)
-    gruz.position.set(-2.8,2.3,1)
-    gruz.rotation.set(0,-0.7,0)
+    //gruz.position.set(-2.8,2.3,1)
+    //gruz.rotation.set(0,-0.7,0)
 
     return gruz
 }
@@ -134,11 +136,13 @@ function render() {
     delta = clock.getDelta();
     time += delta;
 
-    ruka_gruz.rotation.y = abs(cos(time)) * (-3.14);
-    ruka_gruz.position.x = abs(cos(time)) * (-1.5);
+    ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
+    //gruz.rotation.z = abs(cos(time)) * (3.14);
+    //gruz.rotation.x = abs(cos(time)) * (1.8);
+    //ruka_gruz.position.x = abs(cos(time)) * (-1.5);
     //ruka.rotation.y = abs(cos(time)) * (-1);
     //ruka.position.x = abs(cos(time)) * (-1.5);
-    gruz.rotation.z = abs(cos(time)) * (-3.14);
+    //gruz.rotation.z = abs(cos(time)) * (-3.5);
     //gruz.position.x = abs(cos(time)) * (-5);
 }
 

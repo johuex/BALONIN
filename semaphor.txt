@@ -16,8 +16,6 @@ if (tick == 0) {
         krilo1.scale.set(0.75, 0.75, 0.75);
         krilo2.position.set(-0.5, 0, 0.4*(n)*15);
         krilo2.scale.set(0.75, 0.75, 0.75);
-        krilo1.rotation.set(1, 0,-1.58);
-        krilo2.rotation.set(0, 0, -1.58);
         Semaphor.add(krilo1);
         Semaphor.add(krilo2);
 

@@ -119,8 +119,8 @@ function DrawSvetofor(visota) {
     var LightStart;
     var LightStartM=new THREE.MeshBasicMaterial();
     if (visota) {
-        LightStartM.color.set(0xff0000)
-        LightStart  = new THREE.PointLight( 0xff0000,1,8);
+        LightStartM.color.set(0x00ff00)
+        LightStart  = new THREE.PointLight( 0x00ff00,1,8);
     }
     else {
         LightStartM.color.set(0xffba00)

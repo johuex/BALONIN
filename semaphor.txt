@@ -2,23 +2,13 @@ if (tick == 0) {
     if (typeof (sceneexist) == 'undefined') {
         OpenCanvas('wCanvas', WC = 520, HC = 350);
         var scene, camera, renderer; CreateScene(WC, HC);
-
+        var krilo1, krilo2;
         X = 0; Y = 0; Z = 10; W = 1;
 
         Semaphor = DrawSemaphor()
         Semaphor.scale.set(W, W, W)
         Semaphor.position.set(0, 0, -80)
         
-        var krilo1 = DrawCrilo(false);
-        var krilo2 = DrawCrilo(true);
-        n = 22
-        krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
-        krilo1.scale.set(0.75, 0.75, 0.75);
-        krilo2.position.set(-0.5, 0, 0.4*(n)*15);
-        krilo2.scale.set(0.75, 0.75, 0.75);
-        Semaphor.add(krilo1);
-        Semaphor.add(krilo2);
-
         scene.add(Semaphor);
         
 
@@ -193,9 +183,6 @@ function DrawSemaphor() {
         var segment = SegmentSemaphor(material);
         segment.position.z = 0.4*15 * i;
         segment.scale.set(0.4, 0.4, 0.4);
-
-        
-
         Semaphor.add(segment);
     }
     
@@ -210,6 +197,17 @@ function DrawSemaphor() {
     svetofor2.rotation.set(0,-1.58, 0);
     Semaphor.add(svetofor1);
     Semaphor.add(svetofor2);
+    krilo1 = DrawCrilo(false);
+    krilo2 = DrawCrilo(true);
+    n = 22
+    krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
+    krilo1.scale.set(0.75, 0.75, 0.75);
+    krilo2.position.set(-0.5, 0, 0.4*(n)*15);
+    krilo2.scale.set(0.75, 0.75, 0.75);
+    krilo1.rotation.set(1, 0,-1.58);
+    krilo2.rotation.set(0, 0, -1.58);
+    Semaphor.add(krilo1);
+    Semaphor.add(krilo2);
 
     material2 = 0x000000
     var dno = Box(10, 10, 5, 20, material2);

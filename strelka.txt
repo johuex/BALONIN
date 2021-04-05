@@ -2,21 +2,10 @@ if (tick == 0) {
     if (typeof (sceneexist) == 'undefined') {
         OpenCanvas('wCanvas', WC = 520, HC = 350);
         var scene, camera, renderer; CreateScene(WC, HC);
+        var ruka_gruz;
 
         X = 0; Y = 0; Z = 10; W = 1;
-        var strelka = new THREE.Object3D();
-        osnova = DrawOsnova()
-        ruka = DrawRuka()
-        gruz = DrawGruz()
-        ruka.position.set(-1,0,1.5)
-        ruka.rotation.set(0,0.9,1.57)
-        gruz.position.set(-1,0,0);
-        var ruka_gruz = new THREE.Object3D()
-        ruka_gruz.add(ruka); ruka_gruz.add(gruz);
-        gruz.rotation.set(0,0,3.14)
-        ruka_gruz.position.set(-4,2.3,0);
-        //ruka_gruz.rotation.set(0,-0.5,0);
-        strelka.add(osnova); strelka.add(ruka_gruz);
+        strelka = DrawStrelka()
         scene.add(strelka)
         
 
@@ -144,6 +133,23 @@ function render() {
     //ruka.position.x = abs(cos(time)) * (-1.5);
     //gruz.rotation.z = abs(cos(time)) * (-3.5);
     //gruz.position.x = abs(cos(time)) * (-5);
+}
+
+function DrawStrelka() {
+    strelka = new THREE.Object3D();
+    osnova = DrawOsnova()
+    ruka = DrawRuka()
+    gruz = DrawGruz()
+    ruka.position.set(-1,0,1.5)
+    ruka.rotation.set(0,0.9,1.57)
+    gruz.position.set(-1,0,0);
+    ruka_gruz = new THREE.Object3D()
+    ruka_gruz.add(ruka); ruka_gruz.add(gruz);
+    gruz.rotation.set(0,0,3.14)
+    ruka_gruz.position.set(-4,2.3,0);
+    //ruka_gruz.rotation.set(0,-0.5,0);
+    strelka.add(osnova); strelka.add(ruka_gruz);
+    return strelka
 }
 
 function CreateScene(WC, HC) {

@@ -1,0 +1,495 @@
+if  (tick==0) {
+    if (typeof(sceneexist)=='undefined') { 
+     OpenCanvas('wCanvas',WC=520,HC=350);
+     var scene, camera, renderer; CreateScene(WC,HC);
+     var ruka_gruz;
+     var krilo1, krilo2;
+    
+     X=0; Y=0; Z=0; W = 12;
+    
+            SetColorStuff();
+            Poliana=DrawPoliana();
+            Poliana.scale.set(W,W,W); scene.add(Poliana);
+            Poliana.position.set(X,Y,Z);        
+            IronWay=DrawIronWay();
+            IronWay.scale.set(W,W,W); scene.add(IronWay);
+            IronWay.position.set(X,Y,Z);
+    
+            Semaphor = DrawSemaphor();
+            Semaphor.scale.set(W,W,W); scene.add(Semaphor);
+            Semaphor.position.set(X-3*W,Y-W,Z)
+            
+            Strelka = DrawStrelka();
+            Strelka.scale.set(W,W,W); scene.add(Strelka);
+            Strelka.position.set(X+6*W,Y,Z);
+
+            var clock = new THREE.Clock();
+            var time = 0;
+            var delta = 0;
+
+            render();
+        }
+    
+    function Box(x,y,z,col) {
+            var material = new THREE.MeshLambertMaterial({color: col});
+            var geometry = new THREE.CubeGeometry(x,y,z);
+            return new THREE.Mesh( geometry, material ); 
+    }
+    
+    function Cyl(x,y,z,col) {
+            var material = new THREE.MeshLambertMaterial({color: col});
+            var geometry = new THREE.CylinderGeometry(x,y,z,15);
+            return new THREE.Mesh( geometry, material ); 
+    }
+    
+    function DrawPoliana() {
+    var Poliana = new THREE.Object3D();
+       var earth = Box(15, 7, 0.025,0x339922); 
+       var carway = Box(1.3,7,0.015,0x997722); 
+       earth.add(carway);  carway.position.set(3,0,0.01); 
+       Poliana.add(earth);
+    return Poliana;
+    }
+    
+    function DrawIronWay() {
+      var IronWay = new THREE.Object3D();
+    
+      Relsy=GetRelsy(76,0.2); 
+      var way = Box(15,1.3,0.015,0x997722);  
+      Relsy.add(way); Relsy.position.z=0.01;
+      IronWay.add(Relsy);
+    
+     return IronWay;
+    }
+    
+    function Circle(radius, segments, start, lenght, col) {
+        var material = new THREE.MeshLambertMaterial({color: col});
+        var geometry = new THREE.CircleGeometry(radius, segments, start, lenght);
+        return new THREE.Mesh( geometry, material );
+    }
+    
+    function Torus(radius, tube, radialSegments, tubularSegments, arc, col) {
+        var material = new THREE.MeshLambertMaterial({color: col});
+        var geometry = new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
+        return new THREE.Mesh( geometry, material );
+    }
+    
+    
+    function DrawSemaphor() {
+    
+    function DrawSvetofor(visota) {
+        var svet = new THREE.Object3D()
+        var corpus = Box(6, 6, 5, 0x000000);
+           
+        corpus.position.set(0,0,0)
+        svet.add(corpus)
+    
+    
+        var Led = new THREE.Object3D()
+        var LightStart;
+        var LightStartM=new THREE.MeshBasicMaterial();
+        if (visota) {
+            LightStartM.color.set(0x00ff00)
+            LightStart  = new THREE.PointLight( 0x00ff00,1,8);
+        }
+        else {
+            LightStartM.color.set(0xffba00)
+            LightStart  = new THREE.PointLight( 0xffba00,1,8);
+        }
+        var geometryL = new THREE.SphereBufferGeometry(1.7, 15, 15 ); 
+        var LightStartB = new THREE.Mesh(geometryL,LightStartM);
+        Led.add(LightStart); Led.add(LightStartB);
+        LightStartB.position.set(0, 0, 2);
+        LightStart.position.set(0, 0, 2);
+        svet.add(Led)
+        return svet
+    }
+    
+    function SegmentSemaphor(col) { // материал определяет цвет секции семафора
+    
+        //балки верхей части сегмента
+        var balka1 = Cyl(1, 1, 15, col);
+        var balka2 = Cyl(1, 1, 15, col);
+        var balka3 = Cyl(1, 1, 15, col);
+        var balka4 = Cyl(1, 1, 15, col);
+        var balka5 = Cyl(1, 1, 20, col);
+    
+        var segment = new THREE.Object3D()
+        var storona = new THREE.Object3D()
+        balka1.position.set(0, 0, 0);
+        //balka1.rotate.set()
+        storona.add(balka1);
+    
+        balka2.position.set(0, 0, 13);
+        //balka4.rotation.set()
+        storona.add(balka2);
+    
+        balka3.position.set(0, 7.5, 6.5);
+        balka3.rotation.set(1.57, 0, 0);
+        storona.add(balka3);
+    
+        balka4.position.set(0, -7.5, 6.5);
+        balka4.rotation.set(1.57, 0, 0);
+        storona.add(balka4);
+    
+        balka5.position.set(0, 0, 6.5);
+        balka5.rotation.set(-0.7, 0, 0);
+        storona.add(balka5);
+        segment.add(storona);
+    
+        var storona2 = storona.clone();
+        var storona3 = storona.clone();
+        storona2.position.set(6.5, 3.75, 0);
+        storona2.rotation.set(0, 0, 1.04);
+        storona3.position.set(6.5, -3.75, 0);
+        storona3.rotation.set(0, 0, -1.04);
+        segment.add(storona2);
+        segment.add(storona3);
+    
+        return segment
+    }
+        
+    function DrawCrilo(visota) {
+        material = 0xFF0000
+        var box = Box(25, 5, 1, material);
+        var crug = Cyl(5, 5, 1, material);
+        var material2 = 0x000000
+        var box2 = Box(20, 1, 1, material2);
+        var crug2 = Cyl(2, 2, 1, material2);
+        var material3 = 0xFFFFFF
+        var box3 = Box(25, 5, 0.5, material3);
+        var crug3 = Cyl(5, 5, 0.5, material3);
+        var tor = Torus(3.5, 0.1, 0.1, 100, 6.3,"#000000")
+     
+        var crilo = new THREE.Object3D()
+        box.position.set(10,0,0);
+        box.rotation.set(1.57, 0,0);
+        crug.position.set(25,0,0);
+        
+        if (visota){
+            box2.position.set(-10,0,0);
+            box2.rotation.set(1.57, 0,0);
+            crug2.position.set(-10,0,0);
+        }
+        else {
+            box2.position.set(-10,0,7);
+            box2.rotation.set(0,0.7,0);
+            crug2.position.set(-10,0,7);
+        }
+        box3.position.set(10,0.7,0);
+        box3.rotation.set(1.57, 0,0);
+        crug3.position.set(25,0.7,0);
+        tor.rotation.set(1.57, 0, 0);
+        tor.position.set(25,1,0);
+        crilo.add(box);
+        crilo.add(crug);
+        crilo.add(box2)
+        crilo.add(crug2)
+        crilo.add(box3)
+        crilo.add(crug3)
+        crilo.add(tor)
+        return crilo;
+    }
+    
+        var Semaphor = new THREE.Object3D()
+        n = 22
+        var material;
+        //построение сегментов
+        for (i = 0; i < n; i++) {
+            
+            if (i < n/2) {
+                material = 0xFF0000
+            }
+            else {
+                material = 0xFFFFFF
+            }
+            var segment = SegmentSemaphor(material);
+            segment.position.z = 0.4*15 * i;
+            segment.scale.set(0.4, 0.4, 0.4);
+            Semaphor.add(segment);
+        }
+        
+    
+        var svetofor1 = DrawSvetofor(false)
+        var svetofor2 = DrawSvetofor(true)
+        svetofor1.position.set(2.5, -4, 0.4*(n-5)*15);
+        svetofor1.scale.set(0.75, 0.75, 0.75);
+        svetofor1.rotation.set(0,-1.58, 0);
+        svetofor2.position.set(2.5, -4, 0.4*n*15);
+        svetofor2.scale.set(0.75, 0.75, 0.75);
+        svetofor2.rotation.set(0,-1.58, 0);
+        Semaphor.add(svetofor1);
+        Semaphor.add(svetofor2);
+        krilo1 = DrawCrilo(false);
+        krilo2 = DrawCrilo(true);
+        n = 22
+        krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
+        krilo1.scale.set(0.75, 0.75, 0.75);
+        krilo2.position.set(-0.5, 0, 0.4*(n)*15);
+        krilo2.scale.set(0.75, 0.75, 0.75);
+        krilo1.rotation.set(1, 0,-1.58);
+        krilo2.rotation.set(0, 0, -1.58);
+        Semaphor.add(krilo1);
+        Semaphor.add(krilo2);
+    
+        material2 = 0x000000
+        var dno = Box(10, 10, 5, 20, material2);
+        dno.position.set(2,0,-2.5);
+        Semaphor.add(dno);
+    
+        Semaphorout = new THREE.Object3D();
+        var s=0.03; Semaphor.scale.set(s,s,s);
+        Semaphor.position.z+=0.1;
+        Semaphorout.add(Semaphor);
+    
+        return Semaphorout;
+    }
+    
+    function DrawStrelka() {
+    
+    function DrawOsnova() {
+        var osnova = new THREE.Object3D()
+        var balka1 = Box(15,1,1, "#000000")
+        var balka2 = Box(15,1,1, "#000000")
+        var balka3 = Box(5,3,1, "#000000")
+        balka1.position.set(0,0,0)
+        balka2.position.set(0,5,0)
+        balka3.position.set(-4,2.5,0)
+        balka3.rotation.set(0,0,1.57)
+        osnova.add(balka1)
+        osnova.add(balka2)
+        osnova.add(balka3)
+        var corpus = new THREE.Object3D()
+        var stena1 = new Circle(1.5,15,0,3.2, "#000000");
+        var stena2 = new Circle(1.5,15,0,3.2, "#000000");
+        var stena3 = new Circle(1.5,15,0,3.2, "#000000");
+        var stena4 = new Circle(1.5,15,0,3.2, "#000000");
+        stena1.position.set(0,0,0)
+        stena2.position.set(0,0,0.5)
+        stena3.position.set(0,0,0)
+        stena4.position.set(0,0,0.5)
+        stena3.rotation.set(0,3.14,0);
+        stena4.rotation.set(0,3.14,0);
+        corpus.add(stena1); corpus.add(stena2); 
+        corpus.add(stena3); corpus.add(stena4);
+        corpus.position.set(-4,2.5,0);
+        corpus.rotation.set(1.57,0,0);
+        osnova.add(corpus);
+        return osnova
+    }
+    
+    function DrawRuka() {
+        var ruka = new THREE.Object3D();
+        var balka1 = Cyl(0.2,0.2,6, "#ffffff");
+        //balka1.position.set(-3,2.3,0);
+        //balka1.rotation.set(0,-0.5,0);
+        //balka1.position.set(-4,2.3,3)
+        //balka1.rotation.set(0,-1.57,1.57)
+        ruka.add(balka1)
+        return ruka
+    }
+    
+    function DrawGruz() {
+        var gruz = new THREE.Object3D()
+        var box = new Box(2,1.3,1, "#FFFFFF");
+        var box1 = new Box(0.5,1,1, "#FFFFFF");
+        var box2 = new Box(0.5,1,1, "#FFFFFF");
+        var box3 = new Box(1,2,0.3, "#ffffff");
+        var balka1 = Cyl(0.2,0.2,2, "#000000");
+        var balka2 = Cyl(0.2,0.2,3, "#000000");
+        var tor = Torus(0.3, 0.2, 10, 100, 6.3,"#000000");
+        tor.position.set(0,0,1.8)
+        tor.rotation.set(0, 1, 0)
+        balka1.position.set(1,0,1.5)
+        balka1.rotation.set(0,0.3, 1.57)
+        balka2.position.set(2.5,0,1.3)
+        balka2.rotation.set(0,0, 1.57)
+        box.position.set(2,0,1)
+        box.rotation.set(1.57, 0,0)
+        box1.position.set(1.25,0,1.8)
+        box2.position.set(2.75,0,1.8)
+        box3.position.set(2,0,2.3)
+        box3.rotation.set(0,0,1.57)
+        gruz.add(tor)
+        gruz.add(box)
+        gruz.add(balka1)
+        gruz.add(balka2)
+        gruz.add(box1)
+        gruz.add(box2)
+        gruz.add(box3)
+        //gruz.position.set(-2.8,2.3,1)
+        //gruz.rotation.set(0,-0.7,0)
+    
+        return gruz
+    }
+        strelka = new THREE.Object3D();
+        osnova = DrawOsnova()
+        ruka = DrawRuka()
+        gruz = DrawGruz()
+        ruka.position.set(-1,0,1.5)
+        ruka.rotation.set(0,0.9,1.57)
+        gruz.position.set(-1,0,0);
+        ruka_gruz = new THREE.Object3D()
+        ruka_gruz.add(ruka); ruka_gruz.add(gruz);
+        gruz.rotation.set(0,0,3.14)
+        ruka_gruz.position.set(-4,2.3,0);
+        //ruka_gruz.rotation.set(0,-0.5,0);
+        strelka.add(osnova); strelka.add(ruka_gruz);
+    
+        strelkaout = new THREE.Object3D();
+        var s=0.1; strelka.scale.set(s,s,s);
+        strelka.rotation.z=-PI/2;
+        strelkaout.add(strelka);
+        return strelkaout;
+    }
+    
+    
+    function render() {
+        requestAnimationFrame(render);
+        controls.update();
+        renderer.render(scene, camera);
+    
+        delta = clock.getDelta();
+        time += delta;
+    
+        ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
+        //gruz.rotation.z = abs(cos(time)) * (3.14);
+        //gruz.rotation.x = abs(cos(time)) * (1.8);
+        //ruka_gruz.position.x = abs(cos(time)) * (-1.5);
+        //ruka.rotation.y = abs(cos(time)) * (-1);
+        //ruka.position.x = abs(cos(time)) * (-1.5);
+        //gruz.rotation.z = abs(cos(time)) * (-3.5);
+        //gruz.position.x = abs(cos(time)) * (-5);
+    }
+    
+    function GetRelsy(N,Step) {
+    var i,deska,deska2,zabor1;
+    // SPALA
+      var geometry = new THREE.CubeGeometry(0.08,0.5,0.04);
+      var spala = new THREE.Mesh( geometry, spalsm );
+      var wayRelsy=new THREE.Object3D();   
+      for (i=1;i<N;i++) { 
+      var spala2=spala.clone(); 
+        spala2.position.x=Step*(i-N/2);
+        wayRelsy.add(spala2);
+      }
+      var geometry = new THREE.CubeGeometry((N-1)*Step,0.02,0.05);
+      var rels = new THREE.Mesh( geometry, relsym );  
+      var rels2 = rels.clone();
+      rels.position.y = -0.2;  rels2.position.y  = 0.2;
+      rels.position.z +=0.05;  rels2.position.z += 0.05;
+      wayRelsy.add(rels); wayRelsy.add(rels2);
+     return wayRelsy;
+    }
+    
+    
+    function SetColorStuff() {
+    // МАТЕРИАЛ СТЕКЛА И БОКОВ
+      glassfile="http://livelab.spb.ru/labs/files/glass.png";
+      poltex="http://livelab.spb.ru/labs/files/TexturePol.jpg";
+      matdoska = new THREE.MeshLambertMaterial( { color: 0xFFDDDD } );
+      housefile = "http://livelab.spb.ru/labs/files/house.jpg";
+      roofFile = "http://livelab.spb.ru/labs/files/roof.jpg";
+      dverFile = "http://livelab.spb.ru/labs/files/house.jpg";
+      matdoska = new THREE.MeshLambertMaterial({color: 0x50c878});
+    
+           spalsm = new THREE.MeshLambertMaterial({ color: 0x332222} );
+           zaborm = new THREE.MeshStandardMaterial({ color: 0x884422} );
+           relsym = new THREE.MeshStandardMaterial({ color: 0x777777} );
+    
+           var load = new THREE.TextureLoader().load(glassfile);
+            materialGlass = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: load, overdraw: false,
+                depthWrite: true, opacity: 0.3, transparent: true
+            });
+    
+            var load = new THREE.TextureLoader().load(housefile);
+            matdoska = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: load, overdraw: false,
+                depthWrite: true, opacity: 1, transparent: true
+            });
+    
+            var load = new THREE.TextureLoader().load(roofFile);
+            roofMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: load, overdraw: false,
+                depthWrite: true, opacity: 1, transparent: true
+            });
+    
+    
+            var load = new THREE.TextureLoader().load(dverFile);
+            dverMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                map: load, overdraw: false,
+                depthWrite: true, opacity: 0.9, transparent: false
+            });
+    }
+    
+     function render() {
+            requestAnimationFrame(render);
+            controls.update();
+            renderer.render(scene, camera);
+            delta = clock.getDelta();
+            time += delta;
+        
+            ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
+            krilo1.rotation.x = abs(cos(time)) * (-0.9);
+            
+            krilo2.rotation.x = abs(cos(time)) * (-0.9);
+            
+        }
+    
+        function CreateScene(WC, HC) {
+            if (typeof (sceneexist) == 'undefined') {
+                sceneexist = true;
+                // объявление сцены
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x444488);
+                camera = new THREE.PerspectiveCamera(25, WC / HC, 1, 1000);
+                camera.position.x = 0;
+                camera.position.y = -260;
+                camera.position.z = 200;
+                //  camera.lookAt( scene.position );
+                renderer = new THREE.WebGLRenderer({
+                    alpha: true, antialias: true
+                });
+    
+                renderer.setPixelRatio(window.devicePixelRatio);
+                // привяжем отрисовку к html и высоте канвы
+                // renderer.setSize( window.innerWidth, window.innerHeight );
+                document.getElementById("wCanvas").appendChild(renderer.domElement);
+                renderer.setSize(WC, HC);
+                // установим модуль управления камерой
+                controls = new THREE.TrackballControls(camera, renderer.domElement);
+                controls.rotateSpeed = 1.0;
+                controls.zoomSpeed = 1.2;
+                controls.panSpeed = 0.8;
+                controls.noZoom = false;
+                controls.noPan = true;
+                controls.staticMoving = false;
+                controls.dynamicDampingFactor = 0.2;
+                // источники света
+                scene.add(new THREE.AmbientLight(0x555555));
+                var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+                directionalLight.position.set(100, -100, 40).normalize();
+                scene.add(directionalLight);
+                directionalLight.position.set(100, -100, 40).normalize();
+                scene.add(directionalLight);
+            }
+        }
+    }
+    
+    {{html
+    <!DOCTYPE html>
+    <head>
+     <script SRC="http://livelab.spb.ru/x3d/three.min.js"></script>
+     <script SRC="http://livelab.spb.ru/x3d/TrackballControls.js"></script>
+     <script SRC="http://livelab.spb.ru/x3d/OBJLoader.js"></script>
+     <script SRC="http://livelab.spb.ru/x3d/DDSLoader.js"></script>
+     <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
+    </head>
+    html}}
+    
+    

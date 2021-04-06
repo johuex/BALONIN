@@ -1,376 +1,895 @@
-if  (tick==0) {
-    if (typeof(sceneexist)=='undefined') { 
-     OpenCanvas('wCanvas',WC=520,HC=350);
-     var scene, camera, renderer; CreateScene(WC,HC);
-     var ruka_gruz;
-     var krilo1, krilo2;
-     Step = 0; Position =0; 
-     
-    
-     X=0; Y=0; Z=0; W = 12;
-    
-            SetColorStuff();
-            Poliana=DrawPoliana();
-            Poliana.scale.set(W,W,W); scene.add(Poliana);
-            Poliana.position.set(X,Y,Z);        
-            IronWay=DrawIronWay();
-            IronWay.scale.set(W,W,W); scene.add(IronWay);
-            IronWay.position.set(X,Y,Z);
-    
-            Semaphor = DrawSemaphor();
-            Semaphor.scale.set(W,W,W); scene.add(Semaphor);
-            Semaphor.position.set(X-3*W,Y-W,Z)
-            
-            Strelka = DrawStrelka();
-            Strelka.scale.set(W,W,W); scene.add(Strelka);
-            Strelka.position.set(X+6*W,Y,Z);
+if (tick == 0) {
+    if (typeof (sceneexist) == 'undefined') {
+        OpenCanvas('wCanvas', WC = 520, HC = 350);
+        var scene, camera, renderer;
+        var Mechanism_L, Mechanism_R;
+        CreateScene(WC, HC);
+        var ruka_gruz;
+        var krilo1, krilo2;
+        Step = 0;
+        Position = 0;
 
-            var clock = new THREE.Clock();
-            var time = 0;
-            var delta = 0;
-            var poesd = Box(10,10,10,"#FF0000"); scene.add(poesd);
-            poesd.position.set(X-7*W,Y,Z+W/2);
-            //poesd.scale.set(W,W,W);
-            Position0=poesd.position.x;
-            render();
+        X = 0; Y = 0; Z = 0; W = 12; ang = 0;
+
+        SetColorStuff();
+        Poliana = DrawPoliana();
+        Poliana.scale.set(W, W, W);
+        Poliana.position.set(X, Y, Z);
+
+        IronWay = DrawIronWay();
+        IronWay.scale.set(W, W, W);
+        IronWay.position.set(X, Y, Z);
+
+        Semaphor = DrawSemaphor();
+        Semaphor.scale.set(W, W, W);
+        Semaphor.position.set(X - 3 * W, Y - W, Z)
+
+
+        Strelka = DrawStrelka();
+        Strelka.scale.set(W, W, W);
+        Strelka.position.set(X + 6 * W, Y, Z);
+        ruka_gruz.rotation.set(0,1,0)
+
+        var Locomotive = DrawLocomotive();
+        Locomotive.scale.set(W, W, W);
+        Locomotive.position.set(X - 5.5 * W, Y, Z - 0.3);
+
+        Xs = 0.005; // СРЕДНЕЕ ПОЛОЖЕНИЕ ТОЛКАЮЩЕГО СТЕРЖНЯ=ПОРШНЯ
+        // ПОЛОЖЕНИЕ ОСИ 3-го-КОЛЕСА 
+        Xcol = -0.0365;
+        Zcol = 0.0165;
+        AM = 0.005; // АМПЛИТУДА = радиус точки крепления на колесе
+        Xarm = 0.005;
+        Zarm = 0;
+
+        //ЛЕВАЯ СТОРОНА МЕХАНИЗМА ПАРОВОЗА
+        porshen_dynamic_L = Mechanism_L.children[2];
+        stergen_L = Mechanism_L.children[3];
+        Axe2_L = Mechanism_L.children[5];
+        arm_L = Mechanism_L.children[6];
+        shatun_L = Mechanism_L.children[4];
+
+        //ПРАВАЯ СТОРОНА МЕХАНИЗМА ПАРОВОЗА
+        porshen_dynamic_R = Mechanism_R.children[2];
+        stergen_R = Mechanism_R.children[3];
+        Axe2_R = Mechanism_R.children[5];
+        arm_R = Mechanism_R.children[6];
+        shatun_R = Mechanism_R.children[4];
+
+        var clock = new THREE.Clock();
+        var time = 0;
+        var delta = 0;
+
+        Position0 = Locomotive.position.x;
+        with (scene) {
+            scene.add(Poliana);
+            scene.add(IronWay);
+            scene.add(Semaphor);
+            scene.add(Strelka);
+            scene.add(Locomotive);
         }
-    
-    function Box(x,y,z,col) {
-            var material = new THREE.MeshLambertMaterial({color: col});
-            var geometry = new THREE.CubeGeometry(x,y,z);
-            return new THREE.Mesh( geometry, material ); 
+
+
+        WorkMechanism();
+        render();
     }
-    
-    function Cyl(x,y,z,col) {
-            var material = new THREE.MeshLambertMaterial({color: col});
-            var geometry = new THREE.CylinderGeometry(x,y,z,15);
-            return new THREE.Mesh( geometry, material ); 
+
+    function Box(x, y, z, col) {
+        var material = new THREE.MeshLambertMaterial({
+            color: col
+        });
+        var geometry = new THREE.CubeGeometry(x, y, z);
+        return new THREE.Mesh(geometry, material);
     }
-    
+    function Cyl(x, y, z, col) {
+        var material = new THREE.MeshLambertMaterial({
+            color: col
+        });
+        var geometry = new THREE.CylinderGeometry(x, y, z, 15);
+        return new THREE.Mesh(geometry, material);
+    }
     function DrawPoliana() {
-    var Poliana = new THREE.Object3D();
-       var earth = Box(15, 7, 0.025,0x339922); 
-       var carway = Box(1.3,7,0.015,0x997722); 
-       earth.add(carway);  carway.position.set(3,0,0.01); 
-       Poliana.add(earth);
-    return Poliana;
+        var Poliana = new THREE.Object3D();
+        var earth = Box(15, 7, 0.025, 0x339922);
+        var carway = Box(1.3, 7, 0.015, 0x997722);
+        earth.add(carway);
+        carway.position.set(3, 0, 0.01);
+        Poliana.add(earth);
+        return Poliana;
     }
-    
     function DrawIronWay() {
-      var IronWay = new THREE.Object3D();
-    
-      Relsy=GetRelsy(76,0.2); 
-      var way = Box(15,1.3,0.015,0x997722);  
-      Relsy.add(way); Relsy.position.z=0.01;
-      IronWay.add(Relsy);
-    
-     return IronWay;
+        var IronWay = new THREE.Object3D();
+
+        Relsy = GetRelsy(76, 0.2);
+        var way = Box(15, 1.3, 0.015, 0x997722);
+        Relsy.add(way);
+        Relsy.position.z = 0.01;
+        IronWay.add(Relsy);
+
+        return IronWay;
     }
-    
     function Circle(radius, segments, start, lenght, col) {
-        var material = new THREE.MeshLambertMaterial({color: col});
+        var material = new THREE.MeshLambertMaterial({
+            color: col
+        });
         var geometry = new THREE.CircleGeometry(radius, segments, start, lenght);
-        return new THREE.Mesh( geometry, material );
+        return new THREE.Mesh(geometry, material);
     }
-    
     function Torus(radius, tube, radialSegments, tubularSegments, arc, col) {
-        var material = new THREE.MeshLambertMaterial({color: col});
+        var material = new THREE.MeshLambertMaterial({
+            color: col
+        });
         var geometry = new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
-        return new THREE.Mesh( geometry, material );
+        return new THREE.Mesh(geometry, material);
     }
-    
-    
     function DrawSemaphor() {
-    
-    function DrawSvetofor(visota) {
-        var svet = new THREE.Object3D()
-        var corpus = Box(6, 6, 5, 0x000000);
-           
-        corpus.position.set(0,0,0)
-        svet.add(corpus)
-    
-    
-        var Led = new THREE.Object3D()
-        var LightStart;
-        var LightStartM=new THREE.MeshBasicMaterial();
-        if (visota) {
-            LightStartM.color.set(0x00ff00)
-            LightStart  = new THREE.PointLight( 0x00ff00,1,8);
+
+        function DrawSvetofor(visota) {
+            var svet = new THREE.Object3D()
+            var corpus = Box(6, 6, 5, 0x000000);
+
+            corpus.position.set(0, 0, 0)
+            svet.add(corpus)
+
+
+            var Led = new THREE.Object3D()
+            var LightStart;
+            var LightStartM = new THREE.MeshBasicMaterial();
+            if (visota) {
+                LightStartM.color.set(0x00ff00)
+                LightStart = new THREE.PointLight(0x00ff00, 1, 8);
+            } else {
+                LightStartM.color.set(0xffba00)
+                LightStart = new THREE.PointLight(0xffba00, 1, 8);
+            }
+            var geometryL = new THREE.SphereBufferGeometry(1.7, 15, 15);
+            var LightStartB = new THREE.Mesh(geometryL, LightStartM);
+            Led.add(LightStart);
+            Led.add(LightStartB);
+            LightStartB.position.set(0, 0, 2);
+            LightStart.position.set(0, 0, 2);
+            svet.add(Led)
+            return svet
         }
-        else {
-            LightStartM.color.set(0xffba00)
-            LightStart  = new THREE.PointLight( 0xffba00,1,8);
+
+        function SegmentSemaphor(col) { // материал определяет цвет секции семафора
+
+            //балки верхей части сегмента
+            var balka1 = Cyl(1, 1, 15, col);
+            var balka2 = Cyl(1, 1, 15, col);
+            var balka3 = Cyl(1, 1, 15, col);
+            var balka4 = Cyl(1, 1, 15, col);
+            var balka5 = Cyl(1, 1, 20, col);
+
+            var segment = new THREE.Object3D()
+            var storona = new THREE.Object3D()
+            balka1.position.set(0, 0, 0);
+            //balka1.rotate.set()
+            storona.add(balka1);
+
+            balka2.position.set(0, 0, 13);
+            //balka4.rotation.set()
+            storona.add(balka2);
+
+            balka3.position.set(0, 7.5, 6.5);
+            balka3.rotation.set(1.57, 0, 0);
+            storona.add(balka3);
+
+            balka4.position.set(0, -7.5, 6.5);
+            balka4.rotation.set(1.57, 0, 0);
+            storona.add(balka4);
+
+            balka5.position.set(0, 0, 6.5);
+            balka5.rotation.set(-0.7, 0, 0);
+            storona.add(balka5);
+            segment.add(storona);
+
+            var storona2 = storona.clone();
+            var storona3 = storona.clone();
+            storona2.position.set(6.5, 3.75, 0);
+            storona2.rotation.set(0, 0, 1.04);
+            storona3.position.set(6.5, -3.75, 0);
+            storona3.rotation.set(0, 0, -1.04);
+            segment.add(storona2);
+            segment.add(storona3);
+
+            return segment
         }
-        var geometryL = new THREE.SphereBufferGeometry(1.7, 15, 15 ); 
-        var LightStartB = new THREE.Mesh(geometryL,LightStartM);
-        Led.add(LightStart); Led.add(LightStartB);
-        LightStartB.position.set(0, 0, 2);
-        LightStart.position.set(0, 0, 2);
-        svet.add(Led)
-        return svet
-    }
-    
-    function SegmentSemaphor(col) { // материал определяет цвет секции семафора
-    
-        //балки верхей части сегмента
-        var balka1 = Cyl(1, 1, 15, col);
-        var balka2 = Cyl(1, 1, 15, col);
-        var balka3 = Cyl(1, 1, 15, col);
-        var balka4 = Cyl(1, 1, 15, col);
-        var balka5 = Cyl(1, 1, 20, col);
-    
-        var segment = new THREE.Object3D()
-        var storona = new THREE.Object3D()
-        balka1.position.set(0, 0, 0);
-        //balka1.rotate.set()
-        storona.add(balka1);
-    
-        balka2.position.set(0, 0, 13);
-        //balka4.rotation.set()
-        storona.add(balka2);
-    
-        balka3.position.set(0, 7.5, 6.5);
-        balka3.rotation.set(1.57, 0, 0);
-        storona.add(balka3);
-    
-        balka4.position.set(0, -7.5, 6.5);
-        balka4.rotation.set(1.57, 0, 0);
-        storona.add(balka4);
-    
-        balka5.position.set(0, 0, 6.5);
-        balka5.rotation.set(-0.7, 0, 0);
-        storona.add(balka5);
-        segment.add(storona);
-    
-        var storona2 = storona.clone();
-        var storona3 = storona.clone();
-        storona2.position.set(6.5, 3.75, 0);
-        storona2.rotation.set(0, 0, 1.04);
-        storona3.position.set(6.5, -3.75, 0);
-        storona3.rotation.set(0, 0, -1.04);
-        segment.add(storona2);
-        segment.add(storona3);
-    
-        return segment
-    }
-        
-    function DrawCrilo(visota) {
-        material = 0xFF0000
-        var box = Box(25, 5, 1, material);
-        var crug = Cyl(5, 5, 1, material);
-        var material2 = 0x000000
-        var box2 = Box(20, 1, 1, material2);
-        var crug2 = Cyl(2, 2, 1, material2);
-        var material3 = 0xFFFFFF
-        var box3 = Box(25, 5, 0.5, material3);
-        var crug3 = Cyl(5, 5, 0.5, material3);
-        var tor = Torus(3.5, 0.1, 0.1, 100, 6.3,"#000000")
-     
-        var crilo = new THREE.Object3D()
-        box.position.set(10,0,0);
-        box.rotation.set(1.57, 0,0);
-        crug.position.set(25,0,0);
-        
-        if (visota){
-            box2.position.set(-10,0,0);
-            box2.rotation.set(1.57, 0,0);
-            crug2.position.set(-10,0,0);
+
+        function DrawCrilo(visota) {
+            material = 0xFF0000
+            var box = Box(25, 5, 1, material);
+            var crug = Cyl(5, 5, 1, material);
+            var material2 = 0x000000
+            var box2 = Box(20, 1, 1, material2);
+            var crug2 = Cyl(2, 2, 1, material2);
+            var material3 = 0xFFFFFF
+            var box3 = Box(25, 5, 0.5, material3);
+            var crug3 = Cyl(5, 5, 0.5, material3);
+            var tor = Torus(3.5, 0.1, 0.1, 100, 6.3, "#000000")
+
+            var crilo = new THREE.Object3D()
+            box.position.set(10, 0, 0);
+            box.rotation.set(1.57, 0, 0);
+            crug.position.set(25, 0, 0);
+
+            if (visota) {
+                box2.position.set(-10, 0, 0);
+                box2.rotation.set(1.57, 0, 0);
+                crug2.position.set(-10, 0, 0);
+            } else {
+                box2.position.set(-10, 0, 7);
+                box2.rotation.set(0, 0.7, 0);
+                crug2.position.set(-10, 0, 7);
+            }
+            box3.position.set(10, 0.7, 0);
+            box3.rotation.set(1.57, 0, 0);
+            crug3.position.set(25, 0.7, 0);
+            tor.rotation.set(1.57, 0, 0);
+            tor.position.set(25, 1, 0);
+            crilo.add(box);
+            crilo.add(crug);
+            crilo.add(box2)
+            crilo.add(crug2)
+            crilo.add(box3)
+            crilo.add(crug3)
+            crilo.add(tor)
+            return crilo;
         }
-        else {
-            box2.position.set(-10,0,7);
-            box2.rotation.set(0,0.7,0);
-            crug2.position.set(-10,0,7);
-        }
-        box3.position.set(10,0.7,0);
-        box3.rotation.set(1.57, 0,0);
-        crug3.position.set(25,0.7,0);
-        tor.rotation.set(1.57, 0, 0);
-        tor.position.set(25,1,0);
-        crilo.add(box);
-        crilo.add(crug);
-        crilo.add(box2)
-        crilo.add(crug2)
-        crilo.add(box3)
-        crilo.add(crug3)
-        crilo.add(tor)
-        return crilo;
-    }
-    
+
         var Semaphor = new THREE.Object3D()
         n = 22
         var material;
         //построение сегментов
         for (i = 0; i < n; i++) {
-            
-            if (i < n/2) {
+
+            if (i < n / 2) {
                 material = 0xFF0000
-            }
-            else {
+            } else {
                 material = 0xFFFFFF
             }
             var segment = SegmentSemaphor(material);
-            segment.position.z = 0.4*15 * i;
+            segment.position.z = 0.4 * 15 * i;
             segment.scale.set(0.4, 0.4, 0.4);
             Semaphor.add(segment);
         }
-        
-    
+
+
         var svetofor1 = DrawSvetofor(false)
         var svetofor2 = DrawSvetofor(true)
-        svetofor1.position.set(2.5, -4, 0.4*(n-5)*15);
+        svetofor1.position.set(2.5, -4, 0.4 * (n - 5) * 15);
         svetofor1.scale.set(0.75, 0.75, 0.75);
-        svetofor1.rotation.set(0,-1.58, 0);
-        svetofor2.position.set(2.5, -4, 0.4*n*15);
+        svetofor1.rotation.set(0, -1.58, 0);
+        svetofor2.position.set(2.5, -4, 0.4 * n * 15);
         svetofor2.scale.set(0.75, 0.75, 0.75);
-        svetofor2.rotation.set(0,-1.58, 0);
+        svetofor2.rotation.set(0, -1.58, 0);
         Semaphor.add(svetofor1);
         Semaphor.add(svetofor2);
         krilo1 = DrawCrilo(false);
         krilo2 = DrawCrilo(true);
         n = 22
-        krilo1.position.set(-0.5, 0, 0.4*(n-5)*15);
+        krilo1.position.set(-0.5, 0, 0.4 * (n - 5) * 15);
         krilo1.scale.set(0.75, 0.75, 0.75);
-        krilo2.position.set(-0.5, 0, 0.4*(n)*15);
+        krilo2.position.set(-0.5, 0, 0.4 * (n) * 15);
         krilo2.scale.set(0.75, 0.75, 0.75);
-        krilo1.rotation.set(1, 0,-1.58);
-        krilo2.rotation.set(0, 0, -1.58);
+        krilo1.rotation.set(-1.57, 0, -1.58); //нижнее
+        krilo2.rotation.set(0, 0, -1.58); //верхнее
         Semaphor.add(krilo1);
         Semaphor.add(krilo2);
-    
+
         material2 = 0x000000
         var dno = Box(10, 10, 5, 20, material2);
-        dno.position.set(2,0,-2.5);
+        dno.position.set(2, 0, -2.5);
         Semaphor.add(dno);
-    
+
         Semaphorout = new THREE.Object3D();
-        var s=0.03; Semaphor.scale.set(s,s,s);
-        Semaphor.position.z+=0.1;
+        var s = 0.03;
+        Semaphor.scale.set(s, s, s);
+        Semaphor.position.z += 0.1;
         Semaphorout.add(Semaphor);
-    
+
         return Semaphorout;
     }
-    
     function DrawStrelka() {
-    
-    function DrawOsnova() {
-        var osnova = new THREE.Object3D()
-        var balka1 = Box(15,1,1, "#000000")
-        var balka2 = Box(15,1,1, "#000000")
-        var balka3 = Box(5,3,1, "#000000")
-        balka1.position.set(0,0,0)
-        balka2.position.set(0,5,0)
-        balka3.position.set(-4,2.5,0)
-        balka3.rotation.set(0,0,1.57)
-        osnova.add(balka1)
-        osnova.add(balka2)
-        osnova.add(balka3)
-        var corpus = new THREE.Object3D()
-        var stena1 = new Circle(1.5,15,0,3.2, "#000000");
-        var stena2 = new Circle(1.5,15,0,3.2, "#000000");
-        var stena3 = new Circle(1.5,15,0,3.2, "#000000");
-        var stena4 = new Circle(1.5,15,0,3.2, "#000000");
-        stena1.position.set(0,0,0)
-        stena2.position.set(0,0,0.5)
-        stena3.position.set(0,0,0)
-        stena4.position.set(0,0,0.5)
-        stena3.rotation.set(0,3.14,0);
-        stena4.rotation.set(0,3.14,0);
-        corpus.add(stena1); corpus.add(stena2); 
-        corpus.add(stena3); corpus.add(stena4);
-        corpus.position.set(-4,2.5,0);
-        corpus.rotation.set(1.57,0,0);
-        osnova.add(corpus);
-        return osnova
-    }
-    
-    function DrawRuka() {
-        var ruka = new THREE.Object3D();
-        var balka1 = Cyl(0.2,0.2,6, "#ffffff");
-        //balka1.position.set(-3,2.3,0);
-        //balka1.rotation.set(0,-0.5,0);
-        //balka1.position.set(-4,2.3,3)
-        //balka1.rotation.set(0,-1.57,1.57)
-        ruka.add(balka1)
-        return ruka
-    }
-    
-    function DrawGruz() {
-        var gruz = new THREE.Object3D()
-        var box = new Box(2,1.3,1, "#FFFFFF");
-        var box1 = new Box(0.5,1,1, "#FFFFFF");
-        var box2 = new Box(0.5,1,1, "#FFFFFF");
-        var box3 = new Box(1,2,0.3, "#ffffff");
-        var balka1 = Cyl(0.2,0.2,2, "#000000");
-        var balka2 = Cyl(0.2,0.2,3, "#000000");
-        var tor = Torus(0.3, 0.2, 10, 100, 6.3,"#000000");
-        tor.position.set(0,0,1.8)
-        tor.rotation.set(0, 1, 0)
-        balka1.position.set(1,0,1.5)
-        balka1.rotation.set(0,0.3, 1.57)
-        balka2.position.set(2.5,0,1.3)
-        balka2.rotation.set(0,0, 1.57)
-        box.position.set(2,0,1)
-        box.rotation.set(1.57, 0,0)
-        box1.position.set(1.25,0,1.8)
-        box2.position.set(2.75,0,1.8)
-        box3.position.set(2,0,2.3)
-        box3.rotation.set(0,0,1.57)
-        gruz.add(tor)
-        gruz.add(box)
-        gruz.add(balka1)
-        gruz.add(balka2)
-        gruz.add(box1)
-        gruz.add(box2)
-        gruz.add(box3)
-        //gruz.position.set(-2.8,2.3,1)
-        //gruz.rotation.set(0,-0.7,0)
-    
-        return gruz
-    }
+
+        function DrawOsnova() {
+            var osnova = new THREE.Object3D()
+            var balka1 = Box(15, 1, 1, "#000000")
+            var balka2 = Box(15, 1, 1, "#000000")
+            var balka3 = Box(5, 3, 1, "#000000")
+            balka1.position.set(0, 0, 0)
+            balka2.position.set(0, 5, 0)
+            balka3.position.set(-4, 2.5, 0)
+            balka3.rotation.set(0, 0, 1.57)
+            osnova.add(balka1)
+            osnova.add(balka2)
+            osnova.add(balka3)
+            var corpus = new THREE.Object3D()
+            var stena1 = new Circle(1.5, 15, 0, 3.2, "#000000");
+            var stena2 = new Circle(1.5, 15, 0, 3.2, "#000000");
+            var stena3 = new Circle(1.5, 15, 0, 3.2, "#000000");
+            var stena4 = new Circle(1.5, 15, 0, 3.2, "#000000");
+            stena1.position.set(0, 0, 0)
+            stena2.position.set(0, 0, 0.5)
+            stena3.position.set(0, 0, 0)
+            stena4.position.set(0, 0, 0.5)
+            stena3.rotation.set(0, 3.14, 0);
+            stena4.rotation.set(0, 3.14, 0);
+            corpus.add(stena1);
+            corpus.add(stena2);
+            corpus.add(stena3);
+            corpus.add(stena4);
+            corpus.position.set(-4, 2.5, 0);
+            corpus.rotation.set(1.57, 0, 0);
+            osnova.add(corpus);
+            return osnova
+        }
+
+        function DrawRuka() {
+            var ruka = new THREE.Object3D();
+            var balka1 = Cyl(0.2, 0.2, 6, "#ffffff");
+            //balka1.rotation.set(1.57,0,0)
+            ruka.add(balka1)
+            return ruka
+        }
+
+        function DrawGruz() {
+            var gruz = new THREE.Object3D()
+            var box = new Box(2, 1.3, 1, "#FFFFFF");
+            var box1 = new Box(0.5, 1, 1, "#FFFFFF");
+            var box2 = new Box(0.5, 1, 1, "#FFFFFF");
+            var box3 = new Box(1, 2, 0.3, "#ffffff");
+            var balka1 = Cyl(0.2, 0.2, 2, "#000000");
+            var balka2 = Cyl(0.2, 0.2, 3, "#000000");
+            var tor = Torus(0.3, 0.2, 10, 100, 6.3, "#000000");
+            tor.position.set(0, 0, 1.8)
+            tor.rotation.set(0, 1, 0)
+            balka1.position.set(1, 0, 1.5)
+            balka1.rotation.set(0, 0.3, 1.57)
+            balka2.position.set(2.5, 0, 1.3)
+            balka2.rotation.set(0, 0, 1.57)
+            box.position.set(2, 0, 1)
+            box.rotation.set(1.57, 0, 0)
+            box1.position.set(1.25, 0, 1.8)
+            box2.position.set(2.75, 0, 1.8)
+            box3.position.set(2, 0, 2.3)
+            box3.rotation.set(0, 0, 1.57)
+            gruz.add(tor)
+            gruz.add(box)
+            gruz.add(balka1)
+            gruz.add(balka2)
+            gruz.add(box1)
+            gruz.add(box2)
+            gruz.add(box3)
+            //gruz.position.set(-2.8,2.3,1)
+            //gruz.rotation.set(0,-0.7,0)
+
+            return gruz
+        }
         strelka = new THREE.Object3D();
         osnova = DrawOsnova()
         ruka = DrawRuka()
         gruz = DrawGruz()
-        ruka.position.set(-1,0,1.5)
-        ruka.rotation.set(0,0.9,1.57)
-        gruz.position.set(-1,0,0);
+        ruka.position.set(-1, 0, 1.5)
+        ruka.rotation.set(0, 0.9, 1.57)
+        gruz.position.set(-1, 0, 0);
         ruka_gruz = new THREE.Object3D()
-        ruka_gruz.add(ruka); ruka_gruz.add(gruz);
-        gruz.rotation.set(0,0,3.14)
-        ruka_gruz.position.set(-4,2.3,0);
+        ruka_gruz.add(ruka);
+        ruka_gruz.add(gruz);
+        gruz.rotation.set(0, 0, 3.14)
+        ruka_gruz.position.set(-4, 2.3, 0);
         //ruka_gruz.rotation.set(0,-0.5,0);
-        strelka.add(osnova); strelka.add(ruka_gruz);
-    
+        strelka.add(osnova);
+        strelka.add(ruka_gruz);
+
         strelkaout = new THREE.Object3D();
-        var s=0.1; strelka.scale.set(s,s,s);
-        strelka.rotation.z=-PI/2;
+        var s = 0.1;
+        strelka.scale.set(s, s, s);
+        strelka.rotation.z = -PI / 2;
         strelkaout.add(strelka);
         return strelkaout;
     }
-    
-    //Функция передвижения poesda и управление Semaphor
-function controlpoesd(){ 
-    Position+=Step/4; Angle=Step/PI/4; 
-    if (Position>100) { Position=100; Angle=0; }
-    if (Position<0)   { Position=0;   Angle=0; }
-    /*  
-    kreplenieL2.rotation.x+=Angle;
-      kreplenieL21.rotation.x+=Angle;
-      kreplenieL22.rotation.x+=Angle;
-      kreplenieL23.rotation.x+=Angle;
-      kreplenieL10.rotation.x+=Angle;
-      kreplenieL11.rotation.x+=Angle;
-      kreplenieL12.rotation.x+=Angle;
-      kreplenieL13.rotation.x+=Angle;*/
-      poesd.position.x=Position0+2*Position;
-    
-     var LI=100;
-     var x=Position; 
-     if (x==1) sound("bomm.mp3");
-     if (Step>0) if (x==20) sound("done.wav"); 
-     if (Step<0) if (x==80) sound("done.wav"); 
-     if (x>50) x=100-x;
-     /*if(x<5){
+
+    //== СЕКЦИЯ ОПИСАНИЯ ПАРОВОЗА ==
+    function DrawLocomotive() {
+        var Locomotive = new THREE.Object3D();
+        var collect_wheels = GetCollectWheel();
+        var bottom = GetBottom();
+        var smokestack = GetSmokestack();
+        var mechanism = GetMechanism();
+        var van = GetVan();
+        var tender = GetTender();
+
+        with (Locomotive) {
+            Locomotive.add(collect_wheels);
+            Locomotive.add(smokestack);
+            Locomotive.add(bottom);
+            Locomotive.add(mechanism);
+            Locomotive.add(van);
+            Locomotive.add(tender);
+        }
+        return Locomotive;
+    }
+    function GetTender() {
+        var Tender = new THREE.Object3D();
+        var clr_Smokestack = 0x292929;
+        var tender_part_1 = Cyl(0.07, 0.09, 0.15, clr_Smokestack);
+        tender_part_1.rotation.x = PI / 2;
+        tender_part_1.position.set(0.26, 0, 0.3);
+
+        var tender_part_2 = Box(0.17, 0.57, 0.13, clr_Smokestack);
+        tender_part_2.position.set(0.27, 0, 0.23);
+
+        with (Tender) {
+            Tender.add(tender_part_1);
+            Tender.add(tender_part_2);
+        }
+        return Tender;
+    }
+    function GetVan() {
+        var Van = new THREE.Object3D();
+        var clr_Smokestack = 0x292929;
+        var bottom = GetBottom();
+        bottom.position.set(-1.3, 0, 0.115);
+        bottom.scale.z = 0.5;
+        bottom.scale.x = 0.8;
+
+        var collect_wheel = new THREE.Object3D();
+
+        var wheel_1 = Cyl(0.07, 0.07, 0.05, 0x303030);
+        wheel_1.position.set(-1.3, -0.2, 0.175);
+        var wheel_2 = wheel_1.clone();
+        wheel_2.position.y = 0.2;
+
+        var Pair_Wheel_1 = new THREE.Object3D();
+        with (Pair_Wheel_1) {
+            Pair_Wheel_1.add(wheel_1);
+            Pair_Wheel_1.add(wheel_2);
+        }
+
+        var step_wheel = 0.35;
+        var Pair_Wheel_2 = Pair_Wheel_1.clone();
+        Pair_Wheel_2.position.x = Pair_Wheel_2.position.x - step_wheel;
+
+        var Pair_Wheel_3 = Pair_Wheel_2.clone();
+        Pair_Wheel_3.position.x = Pair_Wheel_3.position.x - step_wheel;
+
+        var van_main = Box(1, 0.62, 0.45, clr_Smokestack);
+        van_main.position.set(bottom.position.x - 0.37, 0, 0.49);
+
+        with (collect_wheel) {
+            collect_wheel.add(Pair_Wheel_1);
+            collect_wheel.add(Pair_Wheel_2);
+            collect_wheel.add(Pair_Wheel_3);
+        }
+
+        with (Van) {
+            Van.add(bottom);
+            Van.add(collect_wheel);
+            Van.add(van_main);
+        }
+        Van.position.x = Van.position.x + 0.08;
+        return Van;
+
+    }
+    function GetMechanism() {
+        var Mechanism = new THREE.Object3D();
+        Mechanism_L = new THREE.Object3D();
+        var clr_porsen = 0x292929;
+        var porshen_static = Cyl(0.06, 0.06, 0.22, clr_porsen);
+        porshen_static.position.set(0.25, -0.28, 0.2);
+        porshen_static.rotation.z = PI / 2;
+
+        var porshen_static_small = porshen_static.clone();
+        porshen_static_small.scale.set(0.8, 0.8, 0.8);
+        porshen_static_small.position.set(0.225, -0.28, 0.305);
+
+        var porshen_dynamic = Cyl(0.015, 0.015, 0.22, clr_porsen);
+        porshen_dynamic.position.set(0.16, -0.28, 0.2);
+        porshen_dynamic.rotation.z = PI / 2;
+
+        var stergen = Cyl(0.02, 0.02, 0.06, 0x4A4A4A);
+        stergen.position.set(0.7, -0.28, 0.2);
+        stergen.rotation.z = PI / 2;
+
+        var shatun = Cyl(0.008, 0.008, 0.58, 0xCACACA);
+        shatun.position.set(-0.2, -0.28, 0.2);
+        shatun.rotation.x = PI / 2;
+
+        var Axe2 = Cyl(0.01, 0.01, 0.08, 0x292929);
+        Axe2.position.set(-0.5, -0.26, 0.2)
+
+        var arm = new THREE.Object3D();
+        var Axe3 = Cyl(0.01, 0.01, 0.05, 0x292929);
+        Axe3.position.set(-0.72, -0.24, 0.2)
+
+        var Axe4 = Axe3.clone();
+        Axe4.position.x = -0.94;
+
+        var Axe5 = Axe3.clone();
+        Axe5.position.x = -0.27;
+
+        var Axe6 = Axe3.clone();
+        Axe6.position.x = -0.05;
+
+        var stergenlever = Box(0.01, 0.01, 0.925, 0xEEEEEE);
+        stergenlever.position.set(-0.5, -0.25, 0.2);
+        stergenlever.rotation.y = PI / 2;
+
+        with (arm) {
+            arm.add(Axe3);
+            arm.add(Axe4);
+            arm.add(Axe5);
+            arm.add(Axe6);
+            arm.add(stergenlever);
+
+        }
+
+        with (Mechanism_L) {
+            Mechanism_L.add(porshen_static);
+            Mechanism_L.add(porshen_static_small);
+            Mechanism_L.add(porshen_dynamic);
+            Mechanism_L.add(stergen);
+            Mechanism_L.add(shatun);
+            Mechanism_L.add(Axe2);
+            Mechanism_L.add(arm);
+        }
+
+        Mechanism_R = Mechanism_L.clone();
+        Mechanism_R.position.y = Mechanism_R.position.y + 0.565;
+        Mechanism_R.children[6].position.y = Mechanism_R.children[6].position.y - 0.07;
+        Mechanism_R.children[5].position.y = Mechanism_R.children[5].position.y - 0.04;
+        Mechanism_R.children[6].children[4].position.y = Mechanism_R.children[6].children[4].position.y + 0.015;
+
+        with (Mechanism) {
+            Mechanism.add(Mechanism_R);
+            Mechanism.add(Mechanism_L);
+        }
+
+        return Mechanism;
+
+
+    }
+    function GetMaterialGlass() {
+        return new THREE.MeshBasicMaterial({
+            color: 0xABCDEF,
+            // blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            opacity: 0.4,
+            transparent: true
+        });
+    }
+    function GetBottom() {
+        var Bottom = new THREE.Object3D();
+        var clr_Bottom = 0x5B0000;
+        var beam_1 = Box(1.2, 0.04, 0.15, clr_Bottom);
+        beam_1.position.set(-0.47, 0.155, 0.22);
+
+        var beam_2 = beam_1.clone();
+        beam_2.position.y = -0.155;
+
+        var beam_parall = Box(0.3, 0.07, 0.15, clr_Bottom);
+        beam_parall.rotation.z = -PI / 2;
+        beam_parall.position.set(-0.12, 0, 0.22)
+
+        var pallet = new THREE.Object3D();
+        var step = 0.12;
+        for (let i = 0; i < 4; i++) {
+            var beam_parall = Box(0.3, 0.07, 0.15, clr_Bottom);
+            beam_parall.rotation.z = -PI / 2;
+            beam_parall.position.set(beam_parall.position.x - step, 0, 0.22);
+            pallet.add(beam_parall);
+            step += 0.23;
+        }
+        with (Bottom) {
+            Bottom.add(beam_1);
+            Bottom.add(beam_2);
+            Bottom.add(pallet);
+        }
+        return Bottom;
+
+    }
+    function GetSmokestack() {
+
+        var Smokestack = new THREE.Object3D();
+        var clr_Smokestack = 0x292929;
+        var test = 0x5328FF;
+
+        // Дымовая трубка основание
+        var Smokestack_main = Cyl(0.2, 0.2, 0.3, clr_Smokestack);
+        Smokestack_main.position.set(Smokestack_main.position.x + 0.2, 0, 0.5);
+        Smokestack_main.rotation.z = -PI / 2;
+
+        // Дымовая трубка труба
+        var tube = Cyl(0.05, 0.035, 0.25, clr_Smokestack);
+        tube.position.set(Smokestack_main.position.x + 0.05, 0, Smokestack_main.position.z + 0.25);
+        tube.rotation.x = PI / 2;
+
+        // Дымовая трубка фонарь корпус
+        var ligth_tube = Cyl(0.04, 0.04, 0.05, clr_Smokestack);
+        ligth_tube.position.set(Smokestack_main.position.x + 0.16, 0, Smokestack_main.position.z + 0.22);
+        ligth_tube.rotation.z = -PI / 2;
+
+        // Дымовая трубка дверца дымовой коробки
+        var tube3 = Cyl(0.12, 0.12, 0.02, clr_Smokestack);
+        tube3.position.set(Smokestack_main.position.x + 0.16, 0, Smokestack_main.position.z - 0.08);
+        tube3.rotation.z = -PI / 2;
+
+        // Дымовая трубка основание 2
+        var Smokestack_main2 = Cyl(0.2, 0.2, 0.6, clr_Smokestack);
+        Smokestack_main2.position.set(Smokestack_main.position.x - 0.45, 0, 0.5);
+        Smokestack_main2.rotation.z = -PI / 2;
+
+        // Дымовая трубка основание 2 накладки
+        var yellow_plate = new THREE.Object3D();
+        var step = 0.25;
+        for (let i = 0; i < 6; i++) {
+            var cover_plate = Cyl(0.202, 0.202, 0.012, 0xE9E91E);
+            cover_plate.rotation.z = -PI / 2;
+            cover_plate.position.set(Smokestack_main2.position.x + step - 0.52, 0, Smokestack_main2.position.z);
+            yellow_plate.add(cover_plate);
+            step += 0.10;
+        }
+
+        var topka = Box(0.25, 0.35, 0.44, clr_Smokestack);
+        topka.position.set(Smokestack_main.position.x - 0.87, 0, 0.48);
+
+        var cabin = new THREE.Object3D();
+
+        var cab = Box(0.28, 0.65, 0.35, clr_Smokestack);
+        cab.position.set(Smokestack_main.position.x - 1.13, 0, 0.52);
+
+        var geometry = new THREE.CylinderGeometry(0.325, 0.325, 0.275, 15, 1, false, 5, 2.8);
+        var material = new THREE.MeshBasicMaterial({
+            color: clr_Smokestack
+        });
+
+        var roof = new THREE.Mesh(geometry, material);
+        roof.position.set(Smokestack_main.position.x - 1.13, 0, 0.55);
+        roof.rotation.z = PI / 2;
+
+        var geometry = new THREE.BoxGeometry(0.095, 0.09, 0.15);
+        var window = new THREE.Mesh(geometry, GetMaterialGlass());
+
+        var windows = new THREE.Object3D();
+        var win1 = window.clone();
+        win1.position.set(Smokestack_main.position.x - 1.2, -0.29, 0.6);
+        var win2 = win1.clone();
+        win2.position.x = win1.position.x + 0.12;
+
+        var win3 = win1.clone();
+
+        win3.position.x = win2.position.x + 0.05;
+        win3.position.y = win2.position.y + 0.03;
+
+        //ФОНАРЬ СТЕКЛО
+        var geometry = new THREE.CylinderGeometry(0.03, 0.03, 0.05, 15);
+        var ligth = new THREE.Mesh(geometry, GetMaterialGlass());
+
+        ligth.rotation.z = -PI / 2;
+        ligth.position.set(Smokestack_main.position.x + 0.17, 0, Smokestack_main.position.z + 0.22);
+
+        var win4 = win3.clone();
+        win4.position.y = win3.position.y + 0.51;
+
+        with (windows) {
+            windows.add(win1);
+            windows.add(win2);
+        }
+
+        var windows2 = windows.clone();
+        windows2.position.y = windows.position.y + 0.58;
+
+        with (cabin) {
+            cabin.add(cab);
+            cabin.add(roof);
+        }
+
+        var collect_platform_L = new THREE.Object3D();
+
+        var platform_L = Box(1.1, 0.23, 0.02, clr_Smokestack);
+        platform_L.position.set(cab.position.x + 0.69, -0.2, 0.355)
+
+        var platform_down_L = Box(0.3, 0.145, 0.02, clr_Smokestack);
+        platform_down_L.position.set(platform_L.position.x + 0.625, -0.241, 0.235);
+        platform_down_L.rotation.y = 1;
+
+        var collect_stoyka = new THREE.Object3D();
+
+        var stoyka = Cyl(0.005, 0.005, 0.14, 0xEEEEEE);
+        stoyka.position.set(cab.position.x + 0.2, -0.30, 0.43);
+        stoyka.rotation.x = -PI / 2;
+
+        var stoyka2 = stoyka.clone();
+        stoyka2.position.x = cab.position.x + 1.23;
+
+        var stoyka3 = stoyka2.clone();
+        stoyka3.position.set(cab.position.x + 1.39, -0.30, 0.18);
+
+        var perila = Box(1.15, 0.015, 0.01, 0xEEEEEE);
+        perila.position.set(cab.position.x + 0.66, -0.30, 0.5);
+
+        var perila2 = Box(0.3, 0.015, 0.01, 0xEEEEEE);
+        perila2.position.set(cab.position.x + 1.3145, -0.30, 0.375);
+        perila2.rotation.y = 1;
+
+        with (collect_stoyka) {
+            collect_stoyka.add(stoyka);
+            collect_stoyka.add(stoyka2);
+            collect_stoyka.add(stoyka3);
+            collect_stoyka.add(perila);
+            collect_stoyka.add(perila2);
+        }
+
+        with (collect_platform_L) {
+            collect_platform_L.add(platform_L);
+            collect_platform_L.add(platform_down_L);
+            collect_platform_L.add(collect_stoyka);
+        }
+
+        var collect_platform_R = collect_platform_L.clone();
+        collect_platform_R.position.y = platform_L.position.y + 0.61;
+        collect_platform_R.children[1].position.y = collect_platform_R.children[1].position.y + 0.08;
+        collect_platform_R.children[2].position.y = collect_platform_R.children[1].position.y + 0.36;
+
+        with (Smokestack) {
+            Smokestack.add(Smokestack_main);
+            Smokestack.add(tube);
+            Smokestack.add(ligth_tube);
+            Smokestack.add(tube3);
+            Smokestack.add(Smokestack_main2);
+            Smokestack.add(yellow_plate);
+            Smokestack.add(topka);
+            Smokestack.add(cabin);
+            Smokestack.add(windows);
+            Smokestack.add(windows2);
+            Smokestack.add(win3);
+            Smokestack.add(win4);
+            Smokestack.add(collect_platform_L);
+            Smokestack.add(collect_platform_R);
+            Smokestack.add(ligth);
+        }
+        Smokestack.position.z = Smokestack.position.z + 0.04;
+        return Smokestack;
+    }
+    function GetPair_Wheel() {
+        var Pair_Wheel = new THREE.Object3D();
+        var wheel_1 = Cyl(0.1, 0.1, 0.05, 0xB61717);
+        var wheel_circ_1 = Cyl(0.025, 0.025, 0.007, 0xE8E8E8);
+        var tube = Torus(0.1, 0.0065, 25, 60)
+
+        wheel_circ_1.position.set(0, wheel_1.position.y + 0.23, wheel_1.position.z + 0.2);
+        wheel_1.position.set(0, 0.2, 0.2);
+        tube.position.set(0, wheel_1.position.y + 0.02, wheel_1.position.z);
+
+        tube.rotation.x = -PI / 2;
+
+        var wheel_2 = wheel_1.clone();
+        var wheel_circ_2 = wheel_circ_1.clone();
+        var tube_2 = tube.clone();
+
+        wheel_2.position.y = -0.2;
+        wheel_circ_2.position.y = -0.23;
+        tube_2.position.y = -0.22;
+
+        with (Pair_Wheel) {
+            Pair_Wheel.add(wheel_1);
+            Pair_Wheel.add(wheel_2);
+            Pair_Wheel.add(wheel_circ_1);
+            Pair_Wheel.add(wheel_circ_2);
+            Pair_Wheel.add(tube);
+            Pair_Wheel.add(tube_2);
+        }
+
+        return Pair_Wheel;
+    }
+    function GetCollectWheel() {
+        var step_wheel = 0.22;
+        var collect_wheel = new THREE.Object3D();
+        var Pair_Wheel_1 = GetPair_Wheel();
+        var Pair_Wheel_2 = Pair_Wheel_1.clone();
+        Pair_Wheel_2.position.x = Pair_Wheel_2.position.x - step_wheel;
+        var Pair_Wheel_3 = Pair_Wheel_2.clone();
+        Pair_Wheel_3.position.x = Pair_Wheel_3.position.x - step_wheel;
+        var Pair_Wheel_4 = Pair_Wheel_3.clone();
+        Pair_Wheel_4.position.x = Pair_Wheel_4.position.x - step_wheel;
+        var Pair_Wheel_5 = Pair_Wheel_4.clone();
+        Pair_Wheel_5.position.x = Pair_Wheel_5.position.x - step_wheel;
+        with (collect_wheel) {
+            collect_wheel.add(Pair_Wheel_1);
+            collect_wheel.add(Pair_Wheel_2);
+            collect_wheel.add(Pair_Wheel_3);
+            collect_wheel.add(Pair_Wheel_4);
+            collect_wheel.add(Pair_Wheel_5);
+        }
+        return collect_wheel
+    }
+
+    function WorkMechanism() {
+        porshen_dynamic_L.position.x = W * (0.015 - AM * sin(ang));
+        stergen_L.position.x = W * (Xs - AM * sin(ang));
+        Axe2_L.position.x = W * (Xcol - AM * sin(ang));
+        Axe2_L.position.z = W * (Zcol - AM * cos(ang));
+        arm_L.position.x = W * (Xarm - AM * sin(ang));
+        arm_L.position.z = W * (Zarm - AM * cos(ang));
+        // СМЕЩАЕМ ПО ОТНОШЕНИЮ К СТЕРЖНЮ НА СЕРЕДИНУ РАССТОЯНИЯ ! 
+        shatun_L.position.x = stergen_L.position.x - (Xs - Xcol) / 2 * W;
+        // АМПЛИТУДА по z КАК У Axe, но примерно вдвое меньше 
+        shatun_L.position.z = stergen_L.position.z - W * AM / 2 * cos(ang);
+        // ПОКАЧИВАЕМ ШАТУН (настройка)
+        shatun_L.rotation.z = W / 100 * cos(ang) - PI / 2;
+
+
+        porshen_dynamic_R.position.x = W * (0.015 - AM * sin(ang));
+        stergen_R.position.x = W * (Xs - AM * sin(ang));
+        Axe2_R.position.x = W * (Xcol - AM * sin(ang));
+        Axe2_R.position.z = W * (Zcol - AM * cos(ang));
+        arm_R.position.x = W * (Xarm - AM * sin(ang));
+        arm_R.position.z = W * (Zarm - AM * cos(ang));
+
+        // СМЕЩАЕМ ПО ОТНОШЕНИЮ К СТЕРЖНЮ НА СЕРЕДИНУ РАССТОЯНИЯ ! 
+        shatun_R.position.x = stergen_R.position.x - (Xs - Xcol) / 2 * W;
+        // АМПЛИТУДА по z КАК У Axe, но примерно вдвое меньше 
+        shatun_R.position.z = stergen_R.position.z - W * AM / 2 * cos(ang);
+        // ПОКАЧИВАЕМ ШАТУН (настройка)
+        shatun_R.rotation.z = W / 100 * cos(ang) - PI / 2;
+    }
+    //КОНЕЦ == СЕКЦИЯ ОПИСАНИЯ ПАРОВОЗА ==
+
+    //Функция передвижения Locomotivea и управление Semaphor
+    function controlLocomotive() {
+        Position += Step / 4;
+        Angle = Step / PI / 30;
+        if (Position > 100) {
+            Position = 100;
+            Angle = 0;
+        }
+        if (Position < 0) {
+            Position = 0;
+            Angle = 0;
+        }
+        ang += 0.05; // угол набегает
+
+        // ЛЕВАЯ СТОРОНА
+        if (Step != 0) {
+            WorkMechanism();
+        }
+        var LI = 100;
+        var x = Position;
+        if (x == 1) sound("bomm.mp3");
+        if (Step > 0) {
+            if (x == 20) sound("done.wav");
+            Locomotive.position.x = Position0 + W * 0.01 * AM * W * ang * Position;
+            if (x < 20) {
+                krilo1.rotation.x+=Angle; //нижнее
+                krilo2.rotation.x-=Angle; //верхнее
+            }
+            if (x > 20 && x < 50)
+            {
+                ruka_gruz.rotation.y-=Angle;
+            }
+        }
+
+        if (Step < 0) {
+            if (x == 80) sound("done.wav");
+            Locomotive.position.x = Position0 + W * 0.01 * AM * W * ang * Position;
+            if (x < 20) {
+                krilo1.rotation.x+=Angle;
+                krilo2.rotation.x-=Angle;
+            }
+            if (x > 20 && x < 50)
+            {
+                ruka_gruz.rotation.y+=Angle;
+            }
+        }
+
+        //  if (x > 50) x = 100 - x;
+        if (Step == 0) {
+            //   Locomotive.position.x=Locomotive.position.x;
+            // ang=0;
+        }
+        /*if(x<5){
       Red.intensity =LI;
       Yellow.intensity =0;
       Green.intensity =0;
@@ -399,140 +918,149 @@ function controlpoesd(){
 
 
     function render() {
-        controlpoesd();
+        controlLocomotive();
         requestAnimationFrame(render);
         controls.update();
         renderer.render(scene, camera);
-    
+
         delta = clock.getDelta();
         time += delta;
-    
-        ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
+
+        /*ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
         ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
         krilo1.rotation.x = abs(cos(time)) * (-0.9);
-        krilo2.rotation.x = abs(cos(time)) * (-0.9);
+        krilo2.rotation.x = abs(cos(time)) * (-0.9);*/
     }
-    
-    function GetRelsy(N,Step) {
-    var i,deska,deska2,zabor1;
-    // SPALA
-      var geometry = new THREE.CubeGeometry(0.08,0.5,0.04);
-      var spala = new THREE.Mesh( geometry, spalsm );
-      var wayRelsy=new THREE.Object3D();   
-      for (i=1;i<N;i++) { 
-      var spala2=spala.clone(); 
-        spala2.position.x=Step*(i-N/2);
-        wayRelsy.add(spala2);
-      }
-      var geometry = new THREE.CubeGeometry((N-1)*Step,0.02,0.05);
-      var rels = new THREE.Mesh( geometry, relsym );  
-      var rels2 = rels.clone();
-      rels.position.y = -0.2;  rels2.position.y  = 0.2;
-      rels.position.z +=0.05;  rels2.position.z += 0.05;
-      wayRelsy.add(rels); wayRelsy.add(rels2);
-     return wayRelsy;
+
+    function GetRelsy(N, Step) {
+        var i, deska, deska2, zabor1;
+        // SPALA
+        var geometry = new THREE.CubeGeometry(0.08, 0.5, 0.04);
+        var spala = new THREE.Mesh(geometry, spalsm);
+        var wayRelsy = new THREE.Object3D();
+        for (i = 1; i < N; i++) {
+            var spala2 = spala.clone();
+            spala2.position.x = Step * (i - N / 2);
+            wayRelsy.add(spala2);
+        }
+        var geometry = new THREE.CubeGeometry((N - 1) * Step, 0.02, 0.05);
+        var rels = new THREE.Mesh(geometry, relsym);
+        var rels2 = rels.clone();
+        rels.position.y = -0.2;
+        rels2.position.y = 0.2;
+        rels.position.z += 0.05;
+        rels2.position.z += 0.05;
+        wayRelsy.add(rels);
+        wayRelsy.add(rels2);
+        return wayRelsy;
     }
-    
-    
     function SetColorStuff() {
-    // МАТЕРИАЛ СТЕКЛА И БОКОВ
-      glassfile="http://livelab.spb.ru/labs/files/glass.png";
-      poltex="http://livelab.spb.ru/labs/files/TexturePol.jpg";
-      matdoska = new THREE.MeshLambertMaterial( { color: 0xFFDDDD } );
-      housefile = "http://livelab.spb.ru/labs/files/house.jpg";
-      roofFile = "http://livelab.spb.ru/labs/files/roof.jpg";
-      dverFile = "http://livelab.spb.ru/labs/files/house.jpg";
-      matdoska = new THREE.MeshLambertMaterial({color: 0x50c878});
-    
-           spalsm = new THREE.MeshLambertMaterial({ color: 0x332222} );
-           zaborm = new THREE.MeshStandardMaterial({ color: 0x884422} );
-           relsym = new THREE.MeshStandardMaterial({ color: 0x777777} );
-    
-           var load = new THREE.TextureLoader().load(glassfile);
-            materialGlass = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: load, overdraw: false,
-                depthWrite: true, opacity: 0.3, transparent: true
-            });
-    
-            var load = new THREE.TextureLoader().load(housefile);
-            matdoska = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: load, overdraw: false,
-                depthWrite: true, opacity: 1, transparent: true
-            });
-    
-            var load = new THREE.TextureLoader().load(roofFile);
-            roofMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: load, overdraw: false,
-                depthWrite: true, opacity: 1, transparent: true
-            });
-    
-    
-            var load = new THREE.TextureLoader().load(dverFile);
-            dverMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: load, overdraw: false,
-                depthWrite: true, opacity: 0.9, transparent: false
-            });
+        // МАТЕРИАЛ СТЕКЛА И БОКОВ
+        glassfile = "http://livelab.spb.ru/labs/files/glass.png";
+        poltex = "http://livelab.spb.ru/labs/files/TexturePol.jpg";
+        matdoska = new THREE.MeshLambertMaterial({
+            color: 0xFFDDDD
+        });
+        housefile = "http://livelab.spb.ru/labs/files/house.jpg";
+        roofFile = "http://livelab.spb.ru/labs/files/roof.jpg";
+        dverFile = "http://livelab.spb.ru/labs/files/house.jpg";
+        matdoska = new THREE.MeshLambertMaterial({
+            color: 0x50c878
+        });
+
+        spalsm = new THREE.MeshLambertMaterial({
+            color: 0x332222
+        });
+        zaborm = new THREE.MeshStandardMaterial({
+            color: 0x884422
+        });
+        relsym = new THREE.MeshStandardMaterial({
+            color: 0x777777
+        });
+
+        var load = new THREE.TextureLoader().load(glassfile);
+        materialGlass = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: load,
+            overdraw: false,
+            depthWrite: true,
+            opacity: 0.3,
+            transparent: true
+        });
+
+        var load = new THREE.TextureLoader().load(housefile);
+        matdoska = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: load,
+            overdraw: false,
+            depthWrite: true,
+            opacity: 1,
+            transparent: true
+        });
+
+        var load = new THREE.TextureLoader().load(roofFile);
+        roofMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: load,
+            overdraw: false,
+            depthWrite: true,
+            opacity: 1,
+            transparent: true
+        });
+
+
+        var load = new THREE.TextureLoader().load(dverFile);
+        dverMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            map: load,
+            overdraw: false,
+            depthWrite: true,
+            opacity: 0.9,
+            transparent: false
+        });
     }
-    /*
-     function render() {
-            requestAnimationFrame(render);
-            controls.update();
-            renderer.render(scene, camera);
-            delta = clock.getDelta();
-            time += delta;
-        
-            ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
-            krilo1.rotation.x = abs(cos(time)) * (-0.9);
-            
-            krilo2.rotation.x = abs(cos(time)) * (-0.9);
-            
-        }
-    */
-        function CreateScene(WC, HC) {
-            if (typeof (sceneexist) == 'undefined') {
-                sceneexist = true;
-                // объявление сцены
-                scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x444488);
-                camera = new THREE.PerspectiveCamera(25, WC / HC, 1, 1000);
-                camera.position.x = 0;
-                camera.position.y = -260;
-                camera.position.z = 200;
-                //  camera.lookAt( scene.position );
-                renderer = new THREE.WebGLRenderer({
-                    alpha: true, antialias: true
-                });
-    
-                renderer.setPixelRatio(window.devicePixelRatio);
-                // привяжем отрисовку к html и высоте канвы
-                // renderer.setSize( window.innerWidth, window.innerHeight );
-                document.getElementById("wCanvas").appendChild(renderer.domElement);
-                renderer.setSize(WC, HC);
-                // установим модуль управления камерой
-                controls = new THREE.TrackballControls(camera, renderer.domElement);
-                controls.rotateSpeed = 1.0;
-                controls.zoomSpeed = 1.2;
-                controls.panSpeed = 0.8;
-                controls.noZoom = false;
-                controls.noPan = true;
-                controls.staticMoving = false;
-                controls.dynamicDampingFactor = 0.2;
-                // источники света
-                scene.add(new THREE.AmbientLight(0x555555));
-                var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-                directionalLight.position.set(100, -100, 40).normalize();
-                scene.add(directionalLight);
-                directionalLight.position.set(100, -100, 40).normalize();
-                scene.add(directionalLight);
-            }
+    function CreateScene(WC, HC) {
+        if (typeof (sceneexist) == 'undefined') {
+            sceneexist = true;
+            // объявление сцены
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x444488);
+            camera = new THREE.PerspectiveCamera(25, WC / HC, 1, 1000);
+            camera.position.x = 0;
+            camera.position.y = -260;
+            camera.position.z = 200;
+            //  camera.lookAt( scene.position );
+            renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true
+            });
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+            // привяжем отрисовку к html и высоте канвы
+            // renderer.setSize( window.innerWidth, window.innerHeight );
+            document.getElementById("wCanvas").appendChild(renderer.domElement);
+            renderer.setSize(WC, HC);
+            // установим модуль управления камерой
+            controls = new THREE.TrackballControls(camera, renderer.domElement);
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.noZoom = false;
+            controls.noPan = true;
+            controls.staticMoving = false;
+            controls.dynamicDampingFactor = 0.2;
+            // источники света
+            scene.add(new THREE.AmbientLight(0x555555));
+            var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+            directionalLight.position.set(100, -100, 40).normalize();
+            scene.add(directionalLight);
+            directionalLight.position.set(100, -100, 40).normalize();
+            scene.add(directionalLight);
         }
     }
-    
-    {{html
+}
+
+{{html
     <!DOCTYPE html>
     <head>
      <script SRC="http://livelab.spb.ru/x3d/three.min.js"></script>
@@ -542,7 +1070,7 @@ function controlpoesd(){
      <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
     </head>
     <input type=button value='Gudok' onclick='sound("done.wav");'>
-    <input type=button value='<', id='lpoesd' onclick='Step=-1;'>
-    <input type=button value='Stop', id='rpoesd' onclick='Step=0;'>
-    <input type=button value='>', id='rpoesd' onclick='Step=1;'>
-    html}}
+    <input type=button value='<', id='lLocomotive' onclick='Step=-1;'>
+    <input type=button value='Stop', id='rLocomotive' onclick='Step=0;'>
+    <input type=button value='>', id='rLocomotive' onclick='Step=1;'>
+html}}

@@ -353,13 +353,9 @@ if  (tick==0) {
         time += delta;
     
         ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
-        //gruz.rotation.z = abs(cos(time)) * (3.14);
-        //gruz.rotation.x = abs(cos(time)) * (1.8);
-        //ruka_gruz.position.x = abs(cos(time)) * (-1.5);
-        //ruka.rotation.y = abs(cos(time)) * (-1);
-        //ruka.position.x = abs(cos(time)) * (-1.5);
-        //gruz.rotation.z = abs(cos(time)) * (-3.5);
-        //gruz.position.x = abs(cos(time)) * (-5);
+        ruka_gruz.rotation.y = abs(cos(time)) * (1.8);
+        krilo1.rotation.x = abs(cos(time)) * (-0.9);
+        krilo2.rotation.x = abs(cos(time)) * (-0.9);
     }
     
     function GetRelsy(N,Step) {
@@ -426,7 +422,7 @@ if  (tick==0) {
                 depthWrite: true, opacity: 0.9, transparent: false
             });
     }
-    
+    /*
      function render() {
             requestAnimationFrame(render);
             controls.update();
@@ -440,7 +436,7 @@ if  (tick==0) {
             krilo2.rotation.x = abs(cos(time)) * (-0.9);
             
         }
-    
+    */
         function CreateScene(WC, HC) {
             if (typeof (sceneexist) == 'undefined') {
                 sceneexist = true;
@@ -491,5 +487,3 @@ if  (tick==0) {
      <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
     </head>
     html}}
-    
-    

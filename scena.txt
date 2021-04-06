@@ -29,9 +29,9 @@ if  (tick==0) {
             var time = 0;
             var delta = 0;
             var poesd = Box(10,10,10,"#FF0000"); scene.add(poesd);
-            poesd.position.set(X-3*W,Y-W,Z+W);
+            poesd.position.set(X-7*W,Y,Z+W/2);
             //poesd.scale.set(W,W,W);
-            Position0=poesd.position.y;
+            Position0=poesd.position.x;
             render();
         }
     
@@ -362,7 +362,7 @@ function controlpoesd(){
       kreplenieL11.rotation.x+=Angle;
       kreplenieL12.rotation.x+=Angle;
       kreplenieL13.rotation.x+=Angle;*/
-      poesd.position.x=Position0-2*Position;
+      poesd.position.x=Position0+2*Position;
     
      var LI=100;
      var x=Position; 

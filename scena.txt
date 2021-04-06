@@ -4,6 +4,8 @@ if  (tick==0) {
      var scene, camera, renderer; CreateScene(WC,HC);
      var ruka_gruz;
      var krilo1, krilo2;
+     Step = 0; Position =0; 
+     
     
      X=0; Y=0; Z=0; W = 12;
     
@@ -26,7 +28,10 @@ if  (tick==0) {
             var clock = new THREE.Clock();
             var time = 0;
             var delta = 0;
-
+            var poesd = Box(10,10,10,"#FF0000"); scene.add(poesd);
+            poesd.position.set(X-3*W,Y-W,Z+W);
+            //poesd.scale.set(W,W,W);
+            Position0=poesd.position.y;
             render();
         }
     
@@ -343,8 +348,58 @@ if  (tick==0) {
         return strelkaout;
     }
     
+    //Функция передвижения poesda и управление Semaphor
+function controlpoesd(){ 
+    Position+=Step/4; Angle=Step/PI/4; 
+    if (Position>100) { Position=100; Angle=0; }
+    if (Position<0)   { Position=0;   Angle=0; }
+    /*  
+    kreplenieL2.rotation.x+=Angle;
+      kreplenieL21.rotation.x+=Angle;
+      kreplenieL22.rotation.x+=Angle;
+      kreplenieL23.rotation.x+=Angle;
+      kreplenieL10.rotation.x+=Angle;
+      kreplenieL11.rotation.x+=Angle;
+      kreplenieL12.rotation.x+=Angle;
+      kreplenieL13.rotation.x+=Angle;*/
+      poesd.position.x=Position0-2*Position;
     
+     var LI=100;
+     var x=Position; 
+     if (x==1) sound("bomm.mp3");
+     if (Step>0) if (x==20) sound("done.wav"); 
+     if (Step<0) if (x==80) sound("done.wav"); 
+     if (x>50) x=100-x;
+     /*if(x<5){
+      Red.intensity =LI;
+      Yellow.intensity =0;
+      Green.intensity =0;
+      }else{
+     if(x<10){
+      Red.intensity = LI;
+      Yellow.intensity = LI;
+      Green.intensity =0;
+      }else{
+     if(x<20){
+      Red.intensity =0;
+      Yellow.intensity = LI;
+      Green.intensity =0;
+      }else{
+     if(x<30){
+      Red.intensity =0;
+      Yellow.intensity = LI;
+      Green.intensity = LI;
+      }else{
+     if(x<40){
+      Red.intensity =0;
+      Yellow.intensity =0;
+      Green.intensity = LI;
+    }}}}}*/
+    }
+
+
     function render() {
+        controlpoesd();
         requestAnimationFrame(render);
         controls.update();
         renderer.render(scene, camera);
@@ -486,4 +541,8 @@ if  (tick==0) {
      <script SRC="http://livelab.spb.ru/x3d/DDSLoader.js"></script>
      <script SRC="http://livelab.spb.ru/x3d/MTLLoader.js"></script>
     </head>
+    <input type=button value='Gudok' onclick='sound("done.wav");'>
+    <input type=button value='<', id='lpoesd' onclick='Step=-1;'>
+    <input type=button value='Stop', id='rpoesd' onclick='Step=0;'>
+    <input type=button value='>', id='rpoesd' onclick='Step=1;'>
     html}}

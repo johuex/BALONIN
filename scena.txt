@@ -880,7 +880,7 @@ if (tick == 0) {
             }
             if (x > 20 && x < 50)
             {
-                ruka_gruz.rotation.y+=Angle;
+                ruka_gruz.rotation.y-=Angle;
             }
         }
 
